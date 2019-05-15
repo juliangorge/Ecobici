@@ -31,19 +31,6 @@ def informe():
     #mostrar top de usuarios y estaciones(mirar tp)
     return 0
 
-
-def cargar_bicicletas(bicicletas):
-    #si es el primer elemento, id  = 1000 y sino len()+1
-    for i in range(1000,1251):
-        if i < 1240:
-            estado = "ok"
-        else:
-            estado = "reparacion"
-        if estado == "reparacion":
-            ubicacion = "reparacion"
-        else:
-            ubicacion = "anclada"
-        bicicletas[i]= [estado,ubicacion]
 def cargar_estaciones(estaciones):
     #acumular_lugares_para_anclar = 0
     numero_direccion = 100
@@ -58,6 +45,23 @@ def cargar_estaciones(estaciones):
             capacidad = 30
             bicicletas_ancladas = []
         estaciones[i] =  [direccion,coordenadas,capacidad,bicicletas_ancladas]
+
+def cargar_bicicletas(estaciones, bicicletas):
+    #si es el primer elemento, id  = 1000 y sino len()+1
+    for numero_bicicleta in range(1000,1251):
+        if numero_bicicleta < 1240:
+            estado = "ok"
+        else:
+            estado = "reparacion"
+        if estado == "reparacion":
+            ubicacion = "reparacion"
+        else:
+            ubicacion = "anclada"
+            for i in range (1,31):
+                if(len(estaciones[i][3]) < 30):
+                    estaciones[i][3].append(numero_bicicleta)
+        bicicletas[i]= [estado,ubicacion]
+
 
 def cargar_usuario(usuarios):
     pre_nombres = ['Pablo Guarna','Julieta Ponti','Julián Gorge','Ariel Pisterman','Francopre Cuppari']
