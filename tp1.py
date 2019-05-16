@@ -1,7 +1,6 @@
-################################################################
-################################################################
-################################################################
-
+#
+##########################################################################################
+#
 #                                GRUPO POLILLA
 #
 #.-"""""""---,.               n,                                      ..--------..
@@ -26,16 +25,13 @@
 #                                    '      '
 #                                     '    '
 #                                      '..'
+#
+##########################################################################################
+#
 
-
-
-################################################################
-################################################################
-################################################################
-
-def carga_datos_automatica():
-    #crear 10  estaciones, 5 usuarios, 250 bicis
-    #cargar las bicis en las estaciones "a mano"
+def carga_datos_automatica(estaciones, bicicletas, usuarios):
+    #Crear 10 estaciones, 5 usuarios, 250 bicis
+    #Cargar las bicis en las estaciones "a mano"
     
     #Libero diccionarios
     estaciones = {}
@@ -47,13 +43,8 @@ def carga_datos_automatica():
     cargar_usuario(usuarios)
     cargar_bicicletas(estaciones, bicicletas)
 
-    #Imprimo datos
-    print(estaciones,'\n')
-    print(bicicletas,'\n')
-    print(usuarios,'\n')
-
-def carga_datos_random():
-    #distribuir 250 bicis aleatoriamente en estaciones
+def carga_datos_random(estaciones, bicicletas, usuarios):
+    #Distribuir 250 bicis aleatoriamente en estaciones
     
     #Libero diccionarios
     estaciones = {}
@@ -65,11 +56,6 @@ def carga_datos_random():
     cargar_usuario(usuarios)
     cargar_bicicletas_random(estaciones, bicicletas)
 
-    #Imprimo datos
-    print(estaciones,'\n')
-    print(bicicletas,'\n')
-    print(usuarios,'\n')
-
 def alta_usuario():
     #validar datos ingresados segun la entidad usuario. permite modificar usuario
     return 0
@@ -80,7 +66,22 @@ def desbloquear_usuario():
     #muestra lista de usuarios bloqueados, elegir el usuario, ingresar palabra secreta 
     # y generar un pin aleatorio nuevo
     return 0
-def retirar_bicicleta():
+def bloquear_usuario(usuarios, usuario):
+    #bloquear usuario poniendo su PIN igual a 0
+
+    return 0
+def retirar_bicicleta(estaciones, bicicletas, usuarios):
+    #Selecciono número de estación
+    #Ingrese su DNI y PIN (3 reintentos sino bloquear usuario)
+
+    #Validación ¿y si es vacío o alfanumérico?
+    #estacion = int(input('Seleccione número de estación: '))
+    #Verificar usuario
+    print(estaciones)
+    print(bicicletas)
+    print(usuarios)
+    #if estacion in estaciones:
+        #estaciones[estacion][3]
 
     return 0
 def devolver_bicicleta():
@@ -168,12 +169,13 @@ def mostrar_bicicletas(bicicletas):
 ### MAIN
 import os
 
-def menu():
+def menu(estaciones, bicicletas, usuarios):
     while True:
         print('1 - Carga de datos')
         print('2 - Usuarios')
         print('3 - Retiros automáticos')
         print('4 - Informes')
+        print('5 - Ingresar al sistema')
         print('0 - Salir \n')
 
         #Probar validación, qué pasa si envío valor vacío o alfanumerico
@@ -187,9 +189,16 @@ def menu():
             #Probar validación, qué pasa si envío valor vacío o alfanumerico
             opcion = input('Elige una opción para continuar: ')
             if opcion == 'a':
-                carga_datos_automatica()
+                carga_datos_automatica(estaciones, bicicletas, usuarios)
+                print(estaciones)
+                print(bicicletas)
+                print(usuarios)
+
             elif opcion == 'b':
-                carga_datos_random()
+                carga_datos_random(estaciones, bicicletas, usuarios)
+                print(estaciones)
+                print(bicicletas)
+                print(usuarios)
             #else:
             #   return 0
                 #Error y volver
@@ -209,16 +218,25 @@ def menu():
             print('d - Estaciones más activas\n')
         elif opcion == 5:
             ##Ingreso al sistema
-            '''
-                El ingreso al sistema muestra un nuevo menú:
-                ​Top 10 de usuarios de bicicleta, por cantidad de viajes
-                ​Top 5 de usuarios de bicicleta, por duración acumulada de los viajes
-                ​Listado de estaciones que tienen bicicletas que necesitan reparación, incluyendo esta
-                1. Modificar PIN
-                2. Retirar Bicicleta
-                3. Devolver Bicicleta
-                4. Salir
-            '''
+            print('1 - Modificar PIN')
+            print('2 - Retirar Bicicleta')
+            print('3 - Bicicletas en reparación')
+            print('0 - Devolver Bicicleta\n')
+            
+            #Validacion vacío o alfanumérico
+            sistema = int(input('Elige una opción para continuar: '))
+            if sistema == 1:
+                return 0
+            elif sistema == 2:
+                retirar_bicicleta(estaciones, bicicletas, usuarios)
+            elif sistema == 3:
+                return 0
+            elif sistema == 0:
+                #Salir del menu y volver a iniciarlo
+                return 0
+            else:
+                ##Error volver a ingresar al búcle
+                print('Vuelva a intentarlo')
         elif opcion == 0:
             return False
         else:
@@ -226,7 +244,13 @@ def menu():
             print('Vuelva a intentarlo')
 
 
+#Libero diccionarios
+estaciones = {}
+bicicletas = {}
+usuarios = {}
+
 ### Inicio
 os.system('clear') ##Limpia la terminal
+
 print('¡Bienvenido!\n')
-menu()
+menu(estaciones, bicicletas, usuarios)
