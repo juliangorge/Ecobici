@@ -42,6 +42,7 @@ def carga_datos_automatica(estaciones, bicicletas, usuarios):
     cargar_estaciones(estaciones)
     cargar_usuario(usuarios)
     cargar_bicicletas(estaciones, bicicletas)
+    return (estaciones,bicicletas,usuarios)
 
 def carga_datos_random(estaciones, bicicletas, usuarios):
     #Distribuir 250 bicis aleatoriamente en estaciones
@@ -55,6 +56,8 @@ def carga_datos_random(estaciones, bicicletas, usuarios):
     cargar_estaciones(estaciones)
     cargar_usuario(usuarios)
     cargar_bicicletas_random(estaciones, bicicletas)
+
+    return (estaciones,bicicletas,usuarios)
 
 def alta_usuario():
     #validar datos ingresados segun la entidad usuario. permite modificar usuario
@@ -189,13 +192,13 @@ def menu(estaciones, bicicletas, usuarios):
             #Probar validación, qué pasa si envío valor vacío o alfanumerico
             opcion = input('Elige una opción para continuar: ')
             if opcion == 'a':
-                carga_datos_automatica(estaciones, bicicletas, usuarios)
+                estaciones,bicicletas,usuarios = carga_datos_automatica(estaciones, bicicletas, usuarios)
                 print(estaciones)
                 print(bicicletas)
                 print(usuarios)
 
             elif opcion == 'b':
-                carga_datos_random(estaciones, bicicletas, usuarios)
+                estaciones,bicicletas,usuarios = carga_datos_random(estaciones, bicicletas, usuarios)
                 print(estaciones)
                 print(bicicletas)
                 print(usuarios)
