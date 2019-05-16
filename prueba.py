@@ -1,4 +1,4 @@
-def carga_datos_automatica(estaciones):
+"""def carga_datos_automatica(estaciones):
     #Libero diccionarios
     estaciones = {}
     
@@ -13,3 +13,6 @@ def menu():
     print(estaciones)
 
 menu()
+"""
+diccionario  ={1:"a",2:"b"}
+print (diccionario[3])
