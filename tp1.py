@@ -211,14 +211,41 @@ def menu(estaciones, bicicletas, usuarios):
             print('b - Alta')
             print('c - Modificación')
             print('d - Desbloquear\n')
+
+            opcion = int(input('Elige una opción para continuar: '))
+            if opcion == 'a':
+                return 0
+            if opcion == 'b':
+                return 0
+            if opcion == 'c':
+                return 0
+            if opcion == 'd':
+                return 0
+
         elif opcion == 3:
             print('a - Viaje aleatorio')
             print('b - Viajes aleatorios múltiples\n')
+
+            opcion = int(input('Elige una opción para continuar: '))
+            if opcion == 'a':
+                return 0
+            if opcion == 'b':
+                return 0
         elif opcion == 4:
             print('a - Usuarios con mayor cantidad de viajes')
             print('b - Usuarios con mayor duración acumulada de viajes')
             print('c - Bicicletas en reparación')
             print('d - Estaciones más activas\n')
+
+            opcion = int(input('Elige una opción para continuar: '))
+            if opcion == 'a':
+                return 0
+            if opcion == 'b':
+                return 0
+            if opcion == 'c':
+                return 0
+            if opcion == 'd':
+                return 0
         elif opcion == 5:
             ##Ingreso al sistema
             print('1 - Modificar PIN')
