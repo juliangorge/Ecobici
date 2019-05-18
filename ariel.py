@@ -15,14 +15,14 @@ def alta_usuario():
 def validar_dni (mensaje):
     dni = input (mensaje)
     while  dni.isdigit() and len (dni) == 7 or len (dni) == 8 :
-        return dni
+        return int(dni)
     return validar_dni("El DNI es incorrecto, ingreselo nuevamente")    
     
 
 def validar_pin (mensaje):
     pin = input (mensaje)
     while len (pin) ==4 and pin.isdigit() :
-        return (pin)
+        return int(pin)
     return validar_pin("ingrese un pin correcto")
     
 
@@ -55,16 +55,11 @@ def validar_celular (mensaje):
 def ingresar_usuario (usuarios):
     dni = validar_dni("Ingrese su DNI: ")
     pin = validar_pin("Ingrese su pin: ")
-    print("confirme su numero de pin")
-    pin2 = validar_pin("Reingrese su pin: ")
-    while pin != pin2:
-        print("Los pins no son iguales, ingreselos nuevamente")
-        pin = validar_pin("Ingrese su pin: ")
-        pin2 = validar_pin("Reingrese su pin: ")
     existencia_usuario =  validar_usuario(dni,pin,usuarios)
     if existencia_usuario == "existe":
-        print ("existe")
-        #modificar_usuario(dni,usuarios)
+        print ("Bienvenido ", usuarios[dni[0]])
+        usuarios = modificar_pin(dni,usuarios)
+        print(usuarios)
     elif existencia_usuario == "pin incorrecto":
         print("El PIN es incorrecto")
         ingresar_usuario(usuarios)
@@ -75,20 +70,30 @@ def ingresar_usuario (usuarios):
         
 def validar_usuario(dni,pin,usuarios):
     claves = usuarios.keys()
-    if dni in claves:
-        while usuarios[dni][1] == pin:
+    if not dni in claves:
+        return "no existe"
+    else:
+        if usuarios[dni][1] == pin:
             return "existe"
-        return "pin incorrecto"
-    return "no existe"
-
-
-
+        else:
+            return "pin incorrecto"
     
+
+def modificar_pin(dni,usuarios):
+    print("Cambiando su PIN")
+    pin_nuevo =validar_pin("Ingrese su nuevo pin: ")
+    pin_nuevo2 = validar_pin("Reingrese su nuevo pin: ")
+    while pin_nuevo != pin_nuevo2:
+        print("Los pins no son iguales, ingreselos nuevamente")
+        pin_nuevo = validar_pin("Ingrese su pin: ")
+        pin_nuevo2 = validar_pin("Reingrese su pin: ")
+    usuarios[dni][1] = pin_nuevo
+    return (usuarios)
 
 #bloque principal
 
 print("Ingresando al sistema " )
-usuarios={}
+usuarios={41586809:["aaa",1234]}
 ingresar_usuario(usuarios)
 
 
