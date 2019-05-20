@@ -59,32 +59,152 @@ def carga_datos_random(estaciones, bicicletas, usuarios):
 
     return (estaciones,bicicletas,usuarios)
 
-def alta_usuario():
-    #validar datos ingresados segun la entidad usuario. permite modificar usuario
-    return 0
-def modificar_pin():
-    #solicitar dni y pin (2 veces). permite modificar pin
-    return 0
-def desbloquear_usuario():
-    #muestra lista de usuarios bloqueados, elegir el usuario, ingresar palabra secreta 
-    # y generar un pin aleatorio nuevo
-    return 0
-def bloquear_usuario(usuarios, usuario):
-    #bloquear usuario poniendo su PIN igual a 0
+def alta_usuario(usuarios):
+    dni = validar_dni ("Ingrese su DNI: ")
+    pin = validar_pin ("Ingrese su pin: ")
+    nombre = validar_nombre ("Ingrese su nombre y apellido: ")
+    celular = validar_celular ("Ingrese su numero de celular: ")
+    
+    usuarios[dni] = [nombre,celular,pin]
 
-    return 0
+
+def validar_dni (mensaje):
+    dni = input (mensaje)
+    while  dni.isdigit() and len (dni) == 7 or len (dni) == 8 :
+        return int(dni)
+    return validar_dni("El DNI es incorrecto, ingreselo nuevamente: ")    
+
+###########
+#### VALIDAR QUE EL DNI EXISTE
+
+def validar_pin (mensaje):
+    pin = input (mensaje)
+    contador = 0
+    while contador <= 3:
+        contador += 1
+        while len (pin) == 4 and pin.isdigit() :
+            return int(pin)
+        return validar_pin("Ingrese un pin correcto: ")
+
+#Sólo cuenta las veces que entra a validar: en 3 -> BLOQUEAR
+def validar_bloqueo(usuarios):
+    dni = validar_dni("Ingrese su DNI: ")
+    seguir = True
+    intentos = 0
+    while seguir:
+        pin = input("Ingrese su pin: ")
+        while len (pin) == 4 and pin.isdigit() :
+            if usuarios[dni][2] != pin:
+                if(intentos <= 3):
+                    intentos += 1
+                else:
+                    seguir = False
+                    bloquear_usuario(dni)
+            else:
+                seguir = False
+                return(dni, pin)
+            return None, None
+
+def validar_nombre (mensaje):
+    nombre = input (mensaje)
+    while not nombre.isdigit():
+        return (nombre)
+    return validar_nombre("Ingrese un nombre y apellido correcto: ")
+
+def validar_celular (mensaje):
+    celular = str(input (mensaje))
+    contador_digitos_numericos = 0
+    for caracter in celular: 
+        if caracter in "123456789()+-0":
+            if caracter in "1234567890":
+                contador_digitos_numericos +=1
+        else: 
+            return validar_celular("Ingrese un numero de celular valido: ")
+    if contador_digitos_numericos >= 8:
+        return celular
+    else:
+        return validar_celular("Ingrese un numero de celular valido: ")
+
+def ingresar_usuario (usuarios):
+    dni = validar_dni("Ingrese su DNI: ")
+    pin = validar_pin("Ingrese su pin: ")
+    existencia_usuario =  validar_usuario(dni,pin,usuarios)
+    if existencia_usuario == "existe":
+        print ("Bienvenido ", usuarios[dni[0]])
+        usuarios = modificar_pin(dni,usuarios)
+        print(usuarios)
+    elif existencia_usuario == "pin incorrecto":
+        print("El PIN es incorrecto")
+        ingresar_usuario(usuarios)
+    elif existencia_usuario == "no existe":
+        print("El dni es incorrecto o usted no tiene un usuario")
+        ingresar_usuario(usuarios)
+
+        
+def validar_usuario(dni,pin,usuarios):
+    claves = usuarios.keys()
+    if not dni in claves:
+        return "no existe"
+    else:
+        if usuarios[dni][2] == pin:
+            return "existe"
+        else:
+            return "pin incorrecto"
+    
+
+def modificar_pin(dni,usuarios):
+    print("Cambiando su PIN")
+    pin_nuevo =validar_pin("Ingrese su nuevo pin: ")
+    pin_nuevo2 = validar_pin("Reingrese su nuevo pin: ")
+    while pin_nuevo != pin_nuevo2:
+        print("Los pins no son iguales, ingreselos nuevamente")
+        pin_nuevo = validar_pin("Ingrese su pin: ")
+        pin_nuevo2 = validar_pin("Reingrese su pin: ")
+    usuarios[dni][2] = pin_nuevo
+    return (usuarios)
+
+def desbloquear_usuario(usuarios, usuarios_bloqueados):
+    claves_usuarios = usuarios_bloqueados.keys()
+    for i in usuarios_bloqueados:
+        print ((i+1), usuarios_bloqueados[i])
+    usuario_a_desbloquear = validar_dni('Ingrese el usuario a desbloquear: ')
+
+    if usuario_a_desbloquear in claves_usuarios:
+        palabra_secreta = input ("Ingrese la palabra secreta: ")
+        if palabra_secreta == 'shimano': 
+            print ("Su usuario ha sido desbloqueado.")
+            usuarios_bloqueados.remove(usuario_a_desbloquear)
+            usuarios[dni][2] = randint(1000,9999)
+            print('Su nuevo pin es: ',usuarios[dni][2])
+        else: 
+            palabra_secreta = input ("La clave ha sido incorrecta. Ingresela nuevamente: ")
+    else:
+        print ("Su usuario no esta bloqueado.")
+
+##verificar si existe estacion
+
 def retirar_bicicleta(estaciones, bicicletas, usuarios):
     #Selecciono número de estación
     #Ingrese su DNI y PIN (3 reintentos sino bloquear usuario)
+    dni, pin = validar_bloqueo(usuarios)
 
     #Validación ¿y si es vacío o alfanumérico?
-    #estacion = int(input('Seleccione número de estación: '))
-    #Verificar usuario
-    print(estaciones)
-    print(bicicletas)
-    print(usuarios)
-    #if estacion in estaciones:
-        #estaciones[estacion][3]
+    estacion = int(input('Seleccione número de estación: '))
+    
+    #Verificar estación
+    claves = estaciones.keys()
+    if estacion in claves:
+        numero_anclaje = 0
+        while numero_anclaje <= len(estaciones[estacion][3]):
+            numero_bicicleta = estaciones[estacion][3][0]
+
+            if(bicicletas[numero_bicicleta][0] == "ok"):
+                bicicletas[numero_bicicleta][1] = "En circulación"
+                estaciones[estacion][3].remove(numero_bicicleta)
+                numero_anclaje = 31 #Salgo de while
+                print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje))
+
+            numero_anclaje += 1
 
     return 0
 def devolver_bicicleta():
@@ -161,7 +281,7 @@ def cargar_usuario(usuarios):
         dni += 1
         pin += 10
 
-        usuarios[dni] = [nombre,celular,dni,pin]
+        usuarios[dni] = [nombre,celular,pin]
 
 def mostrar_bicicletas(bicicletas):
     for bici in bicicletas:
@@ -188,6 +308,7 @@ def menu(estaciones, bicicletas, usuarios):
         if opcion == 1:
             print('a - Carga automática')
             print('b - Carga automática aleatoria\n')
+            print('0 - Salir \n')
 
             #Probar validación, qué pasa si envío valor vacío o alfanumerico
             opcion = input('Elige una opción para continuar: ')
@@ -210,21 +331,23 @@ def menu(estaciones, bicicletas, usuarios):
             print('a - Listado')
             print('b - Alta')
             print('c - Modificación')
-            print('d - Desbloquear\n')
+            print('d - Desbloquear')
+            print('0 - Salir \n')
 
-            opcion = int(input('Elige una opción para continuar: '))
+            opcion = input('Elige una opción para continuar: ')
             if opcion == 'a':
-                return 0
+                listar_usuarios(usuarios)
             if opcion == 'b':
-                return 0
+                alta_usuario(usuarios)
             if opcion == 'c':
-                return 0
+                ingresar_usuario(usuarios)
             if opcion == 'd':
-                return 0
+                desbloquear_usuario(usuarios, usuarios_bloqueados)
 
         elif opcion == 3:
             print('a - Viaje aleatorio')
-            print('b - Viajes aleatorios múltiples\n')
+            print('b - Viajes aleatorios múltiples')
+            print('0 - Salir \n')
 
             opcion = int(input('Elige una opción para continuar: '))
             if opcion == 'a':
@@ -235,7 +358,8 @@ def menu(estaciones, bicicletas, usuarios):
             print('a - Usuarios con mayor cantidad de viajes')
             print('b - Usuarios con mayor duración acumulada de viajes')
             print('c - Bicicletas en reparación')
-            print('d - Estaciones más activas\n')
+            print('d - Estaciones más activas')
+            print('0 - Salir \n')
 
             opcion = int(input('Elige una opción para continuar: '))
             if opcion == 'a':
@@ -250,8 +374,8 @@ def menu(estaciones, bicicletas, usuarios):
             ##Ingreso al sistema
             print('1 - Modificar PIN')
             print('2 - Retirar Bicicleta')
-            print('3 - Bicicletas en reparación')
-            print('0 - Devolver Bicicleta\n')
+            print('3 - Devolver bicicletas')
+            print('0 - Salir \n')
             
             #Validacion vacío o alfanumérico
             sistema = int(input('Elige una opción para continuar: '))
@@ -278,6 +402,7 @@ def menu(estaciones, bicicletas, usuarios):
 estaciones = {}
 bicicletas = {}
 usuarios = {}
+usuarios_bloqueados = {}
 
 ### Inicio
 os.system('clear') ##Limpia la terminal
