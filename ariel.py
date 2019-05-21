@@ -4,7 +4,7 @@
 #                                GRUPO POLILLA
 #
 #.-"""""""---,.               n,                                      ..--------..
-#\-          ,,'''-..      n   '\.                ,.n          ..--''           )
+#\-          ,,'''-..      n   '\.                ,.n           ..--''           )
 # \-     . .,;))     ''-,   \     ''.. .'"'. .,-''    .n   ..-''   (( o         _/
 #  \- ' ''''':'          ''-.'"|'--_  '     '  ,.--'''..-''         ' ' ' - .  _/
 #   \-                       ''->.  \'  ,--. '/' >..''                        _/
@@ -80,30 +80,14 @@ def validar_dni (mensaje):
 def validar_pin (mensaje):
     pin = input (mensaje)
     contador = 0
-    while contador <= 3:
-        contador += 1
-        while len (pin) == 4 and pin.isdigit() :
-            return int(pin)
-        return validar_pin("Ingrese un pin correcto: ")
+    while len (pin) == 4 and pin.isdigit() :
+        return int(pin)
+    return validar_pin("Ingrese un pin correcto: ")
 
-#Sólo cuenta las veces que entra a validar: en 3 -> BLOQUEAR
-def validar_bloqueo(usuarios):
-    dni = validar_dni("Ingrese su DNI: ")
-    seguir = True
-    intentos = 0
-    while seguir:
-        pin = input("Ingrese su pin: ")
-        while len (pin) == 4 and pin.isdigit() :
-            if usuarios[dni][2] != pin:
-                if(intentos <= 3):
-                    intentos += 1
-                else:
-                    seguir = False
-                    bloquear_usuario(dni)
-            else:
-                seguir = False
-                return(dni, pin)
-            return None, None
+
+def bloquear_usuario(dni):
+    print("aca se bloquea el usuario")
+    return 0
 
 def validar_nombre (mensaje):
     nombre = input (mensaje)
@@ -174,39 +158,59 @@ def desbloquear_usuario(usuarios, usuarios_bloqueados):
         if palabra_secreta == 'shimano': 
             print ("Su usuario ha sido desbloqueado.")
             usuarios_bloqueados.remove(usuario_a_desbloquear)
-            usuarios[dni][2] = randint(1000,9999)
-            print('Su nuevo pin es: ',usuarios[dni][2])
+            usuarios[usuario_a_desbloquear][2] = randint(1000,9999)
+            print('Su nuevo pin es: ',usuarios[usuario_a_desbloquear][2])
         else: 
             palabra_secreta = input ("La clave ha sido incorrecta. Ingresela nuevamente: ")
     else:
         print ("Su usuario no esta bloqueado.")
 
+
+#Sólo cuenta las veces que entra a validar: en 3 -> BLOQUEAR
+def validar_bloqueo(usuarios):
+    dni = validar_dni("Ingrese su DNI: ")
+    claves_usuarios = usuarios.keys()
+    while not dni in claves_usuarios:
+        print("El usuario no existe, ingrese un usuario valido ")
+        return validar_bloqueo(usuarios)
+    intentos = 0
+    pin = validar_pin("Ingrese su pin")
+    while usuarios[dni][2] != pin:
+        if(intentos <= 3):
+            intentos += 1
+            pin = validar_pin("Su pin es incorrecto. Ingreselo nuevamente: ")
+        else:   
+            usuarios = bloquear_usuario(dni)
+            return (usuarios)
+    return(usuarios)
 ##verificar si existe estacion
 
 def retirar_bicicleta(estaciones, bicicletas, usuarios):
     #Selecciono número de estación
-    #Ingrese su DNI y PIN (3 reintentos sino bloquear usuario)
-    dni, pin = validar_bloqueo(usuarios)
+    
 
     #Validación ¿y si es vacío o alfanumérico?
     estacion = int(input('Seleccione número de estación: '))
-    
     #Verificar estación
     claves = estaciones.keys()
-    if estacion in claves:
-        numero_anclaje = 0
-        while numero_anclaje <= len(estaciones[estacion][3]):
-            numero_bicicleta = estaciones[estacion][3][0]
-
-            if(bicicletas[numero_bicicleta][0] == "ok"):
-                bicicletas[numero_bicicleta][1] = "En circulación"
-                estaciones[estacion][3].remove(numero_bicicleta)
-                numero_anclaje = 31 #Salgo de while
-                print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje))
-
-            numero_anclaje += 1
-
-    return 0
+    while not estacion in claves:
+        estacion = int(input('Seleccione número de estación: '))
+    #Ingrese su DNI y PIN (3 reintentos sino bloquear usuario)    
+    usuarios =  validar_bloqueo(usuarios)        
+    numero_anclaje = 0
+    while numero_anclaje <= len(estaciones[estacion][3]):
+        numero_bicicleta = estaciones[estacion][3][0]
+        if(bicicletas[numero_bicicleta][0] == "ok"):
+            bicicletas[numero_bicicleta][1] = "En circulación"
+            estaciones[estacion][3].remove(numero_bicicleta)
+            numero_anclaje = 31 #Salgo de while
+            print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje))
+            return (estaciones, bicicletas)    
+        numero_anclaje += 1     
+    print ("No hay bicicleta disponible, intente en otra estacions")            
+    return (usuarios,bicicletas,estaciones)        
+            
+       
 def devolver_bicicleta():
     return 0
 def simulacion():
@@ -286,7 +290,15 @@ def cargar_usuario(usuarios):
 def mostrar_bicicletas(bicicletas):
     for bici in bicicletas:
         print (bici, bicicletas[bici])
-
+def listar_usuarios(usuarios):
+    claves = usuarios.keys()
+    lista_usuarios = []
+    for dni in claves:
+         lista_usuarios.append([dni, usuarios[dni][0]])
+    lista_usuarios.sort(key= lambda usuario: usuario[0])
+    print("Usuarios en el sistema: ")
+    for indice in range(0,len(lista_usuarios)):
+        print((indice+1), lista_usuarios[indice][0], lista_usuarios[indice][1] )
 
 
 ### MAIN
@@ -382,7 +394,7 @@ def menu(estaciones, bicicletas, usuarios):
             if sistema == 1:
                 return 0
             elif sistema == 2:
-                retirar_bicicleta(estaciones, bicicletas, usuarios)
+                usuarios, estaciones, bicicletas = retirar_bicicleta(estaciones, bicicletas, usuarios)
             elif sistema == 3:
                 return 0
             elif sistema == 0:
