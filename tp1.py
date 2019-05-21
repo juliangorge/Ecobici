@@ -1,34 +1,3 @@
-#
-##########################################################################################
-#
-#                                GRUPO POLILLA
-#
-#.-"""""""---,.               n,                                      ..--------..
-#\-          ,,'''-..      n   '\.                ,.n           ..--''           )
-# \-     . .,;))     ''-,   \     ''.. .'"'. .,-''    .n   ..-''   (( o         _/
-#  \- ' ''''':'          ''-.'"|'--_  '     '  ,.--'''..-''         ' ' ' - .  _/
-#   \-                       ''->.  \'  ,--. '/' >..''                        _/
-#    \                     (,       /  /.  .\ \ ''    ,)                     ./
-#     ''.    .  ..         ')          \ .. /         ('          ..       ./
-#        ''-... . ._ .__         .''.  //..\\  ,'.            __ _ _,__.--'
-#            /' ((    ..'' ' ' '-'  6  \/__\/  ' '- - -' ' ',''   - '\
-#           '(.  6,    '..          /.   ''  .'          ,,'     ) )  )
-#            '\  \'C_,_   ==,      / '_      _|\       ,'', ,,_.;-' _/
-#              '._ ,   ')   E     /'|_ ')()('_' \     C  ,I'''  _.-'
-#                 ''''''\ (('   ,/  ''  (()) ''  '-._ _ __---'''
-#                        '' '' '    '==='()'=='
-#                                   '(       )'    
-#                                   '6        '
-#                                    \       /
-#                                    '       '
-#                                    '       '
-#                                    '      '
-#                                     '    '
-#                                      '..'
-#
-##########################################################################################
-#
-
 def carga_datos_automatica(estaciones, bicicletas, usuarios):
     #Crear 10 estaciones, 5 usuarios, 250 bicis
     #Cargar las bicis en las estaciones "a mano"
@@ -313,31 +282,26 @@ def menu(estaciones, bicicletas, usuarios):
         print('5 - Ingresar al sistema')
         print('0 - Salir \n')
 
-        #Probar validación, qué pasa si envío valor vacío o alfanumerico
+        #Si se ingresa un valor distinto, vuelve al menú raíz
         opcion = int(input('Elige una opción para continuar: '))
-
-        #tiene que poder volver al menu anterior?
+        
         if opcion == 1:
             print('a - Carga automática')
             print('b - Carga automática aleatoria\n')
             print('0 - Salir \n')
 
-            #Probar validación, qué pasa si envío valor vacío o alfanumerico
             opcion = input('Elige una opción para continuar: ')
             if opcion == 'a':
                 estaciones,bicicletas,usuarios = carga_datos_automatica(estaciones, bicicletas, usuarios)
-                print(estaciones)
-                print(bicicletas)
-                print(usuarios)
-
+                os.system('clear') ##Limpia la terminal
+                print('Datos cargados!\n')
             elif opcion == 'b':
                 estaciones,bicicletas,usuarios = carga_datos_random(estaciones, bicicletas, usuarios)
-                print(estaciones)
-                print(bicicletas)
-                print(usuarios)
-            #else:
-            #   return 0
-                #Error y volver
+                os.system('clear') ##Limpia la terminal
+                print('Datos aleatorios cargados!\n')
+            else:
+                os.system('clear') ##Limpia la terminal
+                print('La opción no existe.\n')
 
         elif opcion == 2:
             print('a - Listado')
@@ -355,17 +319,28 @@ def menu(estaciones, bicicletas, usuarios):
                 ingresar_usuario(usuarios)
             if opcion == 'd':
                 desbloquear_usuario(usuarios, usuarios_bloqueados)
+            if opcion == '0':
+                desbloquear_usuario(usuarios, usuarios_bloqueados)
+            else:
+                os.system('clear') ##Limpia la terminal
+                print('La opción no existe.\n')
 
         elif opcion == 3:
             print('a - Viaje aleatorio')
             print('b - Viajes aleatorios múltiples')
             print('0 - Salir \n')
 
-            opcion = int(input('Elige una opción para continuar: '))
+            opcion = input('Elige una opción para continuar: ')
             if opcion == 'a':
                 return 0
             if opcion == 'b':
                 return 0
+            if opcion == '0':
+                return 0
+            else:
+                os.system('clear') ##Limpia la terminal
+                print('La opción no existe.\n')
+
         elif opcion == 4:
             print('a - Usuarios con mayor cantidad de viajes')
             print('b - Usuarios con mayor duración acumulada de viajes')
@@ -373,7 +348,7 @@ def menu(estaciones, bicicletas, usuarios):
             print('d - Estaciones más activas')
             print('0 - Salir \n')
 
-            opcion = int(input('Elige una opción para continuar: '))
+            opcion = input('Elige una opción para continuar: ')
             if opcion == 'a':
                 return 0
             if opcion == 'b':
@@ -382,6 +357,12 @@ def menu(estaciones, bicicletas, usuarios):
                 return 0
             if opcion == 'd':
                 return 0
+            if opcion == '0':
+                return 0
+            else:
+                os.system('clear') ##Limpia la terminal
+                print('La opción no existe.\n')
+
         elif opcion == 5:
             ##Ingreso al sistema
             print('1 - Modificar PIN')
@@ -398,19 +379,23 @@ def menu(estaciones, bicicletas, usuarios):
             elif sistema == 3:
                 return 0
             elif sistema == 0:
-                #Salir del menu y volver a iniciarlo
                 return 0
             else:
-                ##Error volver a ingresar al búcle
-                print('Vuelva a intentarlo')
+                os.system('clear') ##Limpia la terminal
+                print('La opción no existe.\n')
+
         elif opcion == 0:
             return False
         else:
-            ##Error volver a ingresar al búcle
+            os.system('clear') ##Limpia la terminal
             print('Vuelva a intentarlo')
 
 
-#Libero diccionarios
+##############################
+#        MAIN CODE           #
+##############################
+
+#Inicializo diccionarios
 estaciones = {}
 bicicletas = {}
 usuarios = {}
@@ -418,6 +403,5 @@ usuarios_bloqueados = {}
 
 ### Inicio
 os.system('clear') ##Limpia la terminal
-
 print('¡Bienvenido!\n')
 menu(estaciones, bicicletas, usuarios)
