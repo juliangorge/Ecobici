@@ -1,3 +1,6 @@
+from random import randint, random
+import os
+
 def carga_datos_automatica(estaciones, bicicletas, usuarios):
     #Crear 10 estaciones, 5 usuarios, 250 bicis
     #Cargar las bicis en las estaciones "a mano"
@@ -36,7 +39,6 @@ def alta_usuario(usuarios):
     
     usuarios[dni] = [nombre,celular,pin]
 
-
 def validar_dni (mensaje):
     dni = input (mensaje)
     while  dni.isdigit() and len (dni) == 7 or len (dni) == 8 :
@@ -52,7 +54,6 @@ def validar_pin (mensaje):
     while len (pin) == 4 and pin.isdigit() :
         return int(pin)
     return validar_pin("Ingrese un pin correcto: ")
-
 
 def bloquear_usuario(dni):
     print("aca se bloquea el usuario")
@@ -92,8 +93,7 @@ def ingresar_usuario (usuarios):
     elif existencia_usuario == "no existe":
         print("El dni es incorrecto o usted no tiene un usuario")
         ingresar_usuario(usuarios)
-
-        
+       
 def validar_usuario(dni,pin,usuarios):
     claves = usuarios.keys()
     if not dni in claves:
@@ -103,7 +103,6 @@ def validar_usuario(dni,pin,usuarios):
             return "existe"
         else:
             return "pin incorrecto"
-    
 
 def modificar_pin(dni,usuarios):
     print("Cambiando su PIN")
@@ -134,7 +133,6 @@ def desbloquear_usuario(usuarios, usuarios_bloqueados):
     else:
         print ("Su usuario no esta bloqueado.")
 
-
 #Sólo cuenta las veces que entra a validar: en 3 -> BLOQUEAR
 def validar_bloqueo(usuarios):
     dni = validar_dni("Ingrese su DNI: ")
@@ -143,7 +141,7 @@ def validar_bloqueo(usuarios):
         print("El usuario no existe, ingrese un usuario valido ")
         return validar_bloqueo(usuarios)
     intentos = 0
-    pin = validar_pin("Ingrese su pin")
+    pin = validar_pin("Ingrese su pin: ")
     while usuarios[dni][2] != pin:
         if(intentos <= 3):
             intentos += 1
@@ -155,9 +153,6 @@ def validar_bloqueo(usuarios):
 ##verificar si existe estacion
 
 def retirar_bicicleta(estaciones, bicicletas, usuarios):
-    #Selecciono número de estación
-    
-
     #Validación ¿y si es vacío o alfanumérico?
     estacion = int(input('Seleccione número de estación: '))
     #Verificar estación
@@ -174,14 +169,15 @@ def retirar_bicicleta(estaciones, bicicletas, usuarios):
             estaciones[estacion][3].remove(numero_bicicleta)
             numero_anclaje = 31 #Salgo de while
             print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje))
-            return (estaciones, bicicletas)    
+            return (estaciones, bicicletas, usuarios)
         numero_anclaje += 1     
-    print ("No hay bicicleta disponible, intente en otra estacions")            
-    return (usuarios,bicicletas,estaciones)        
+    print ("No hay bicicleta disponible, intente en otra estacions")
+    return (estaciones, bicicletas, usuarios)
 
 def viaje_aleatorio():
+    return 0
 def viaje_aleatorio_multiple():
-       
+    return 0       
 def devolver_bicicleta():
     return 0
 def simulacion():
@@ -226,7 +222,6 @@ def cargar_bicicletas(estaciones, bicicletas):
                     estaciones[i][3].append(numero_bicicleta)
         bicicletas[numero_bicicleta] = [estado,ubicacion]
 
-from random import randint, random
 def cargar_bicicletas_random(estaciones, bicicletas):
     for numero_bicicleta in range(1000,1251):
         if numero_bicicleta < 1240:
@@ -241,7 +236,6 @@ def cargar_bicicletas_random(estaciones, bicicletas):
             if(len(estaciones[numero_estacion][3]) < 30):
                     estaciones[numero_estacion][3].append(numero_bicicleta)
         bicicletas[numero_bicicleta]= [estado,ubicacion]
-
 
 def cargar_usuario(usuarios):
     pre_nombres = ['Pablo Guarna','Julieta Ponti','Julián Gorge','Ariel Pisterman','Francopre Cuppari']
@@ -261,6 +255,7 @@ def cargar_usuario(usuarios):
 def mostrar_bicicletas(bicicletas):
     for bici in bicicletas:
         print (bici, bicicletas[bici])
+
 def listar_usuarios(usuarios):
     claves = usuarios.keys()
     lista_usuarios = []
@@ -271,12 +266,9 @@ def listar_usuarios(usuarios):
     for indice in range(0,len(lista_usuarios)):
         print((indice+1), lista_usuarios[indice][0], lista_usuarios[indice][1] )
 
-
 ##############################
 #####     MAIN CODE      #####
 ##############################
-
-import os
 
 def menu(estaciones, bicicletas, usuarios):
     while True:
@@ -380,7 +372,7 @@ def menu(estaciones, bicicletas, usuarios):
             if sistema == 1:
                 return 0
             elif sistema == 2:
-                usuarios, estaciones, bicicletas = retirar_bicicleta(estaciones, bicicletas, usuarios)
+                estaciones, bicicletas, usuarios = retirar_bicicleta(estaciones, bicicletas, usuarios)
             elif sistema == 3:
                 return 0
             elif sistema == 0:
