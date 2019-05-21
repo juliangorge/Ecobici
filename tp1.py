@@ -178,7 +178,9 @@ def retirar_bicicleta(estaciones, bicicletas, usuarios):
         numero_anclaje += 1     
     print ("No hay bicicleta disponible, intente en otra estacions")            
     return (usuarios,bicicletas,estaciones)        
-            
+
+def viaje_aleatorio():
+def viaje_aleatorio_multiple():
        
 def devolver_bicicleta():
     return 0
@@ -332,9 +334,9 @@ def menu(estaciones, bicicletas, usuarios):
 
             opcion = input('Elige una opción para continuar: ')
             if opcion == 'a':
-                return 0
+                viaje_aleatorio()
             if opcion == 'b':
-                return 0
+                viaje_aleatorio_multiple()
             if opcion == '0':
                 return 0
             else:
@@ -392,7 +394,7 @@ def menu(estaciones, bicicletas, usuarios):
 
 
 ##############################
-#        MAIN CODE           #
+#####     MAIN CODE      #####
 ##############################
 
 #Inicializo diccionarios
