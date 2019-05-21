@@ -266,6 +266,20 @@ def listar_usuarios(usuarios):
     for indice in range(0,len(lista_usuarios)):
         print((indice+1), lista_usuarios[indice][0], lista_usuarios[indice][1] )
 
+def cantidad_viajes():
+    return 0
+def duracion_viajes():
+    return 0
+def bicicletas_reparacion(bicicletas):
+    en_reparacion = 0
+    for numero_bicicleta, estado in bicicletas.items():
+        if(estado[0] == 'reparacion'):
+            en_reparacion += 1
+    print('Bicicletas en reparación: {}\n'.format(en_reparacion))
+    
+def top_estaciones(estaciones):
+    return 0
+
 ##############################
 #####     MAIN CODE      #####
 ##############################
@@ -310,13 +324,13 @@ def menu(estaciones, bicicletas, usuarios):
             opcion = input('Elige una opción para continuar: ')
             if opcion == 'a':
                 listar_usuarios(usuarios)
-            if opcion == 'b':
+            elif opcion == 'b':
                 alta_usuario(usuarios)
-            if opcion == 'c':
+            elif opcion == 'c':
                 ingresar_usuario(usuarios)
-            if opcion == 'd':
+            elif opcion == 'd':
                 desbloquear_usuario(usuarios, usuarios_bloqueados)
-            if opcion == '0':
+            elif opcion == '0':
                 desbloquear_usuario(usuarios, usuarios_bloqueados)
             else:
                 os.system('clear') ##Limpia la terminal
@@ -330,9 +344,9 @@ def menu(estaciones, bicicletas, usuarios):
             opcion = input('Elige una opción para continuar: ')
             if opcion == 'a':
                 viaje_aleatorio()
-            if opcion == 'b':
+            elif opcion == 'b':
                 viaje_aleatorio_multiple()
-            if opcion == '0':
+            elif opcion == '0':
                 return 0
             else:
                 os.system('clear') ##Limpia la terminal
@@ -347,14 +361,14 @@ def menu(estaciones, bicicletas, usuarios):
 
             opcion = input('Elige una opción para continuar: ')
             if opcion == 'a':
-                return 0
-            if opcion == 'b':
-                return 0
-            if opcion == 'c':
-                return 0
-            if opcion == 'd':
-                return 0
-            if opcion == '0':
+                cantidad_viajes()
+            elif opcion == 'b':
+                duracion_viajes()
+            elif opcion == 'c':
+                bicicletas_reparacion(bicicletas)
+            elif opcion == 'd':
+                top_estaciones(estaciones)
+            elif opcion == '0':
                 return 0
             else:
                 os.system('clear') ##Limpia la terminal
@@ -370,11 +384,11 @@ def menu(estaciones, bicicletas, usuarios):
             #Validacion vacío o alfanumérico
             sistema = int(input('Elige una opción para continuar: '))
             if sistema == 1:
-                #modificar_pin()
+                modificar_pin()
             elif sistema == 2:
                 estaciones, bicicletas, usuarios = retirar_bicicleta(estaciones, bicicletas, usuarios)
             elif sistema == 3:
-                #devolver_bicicleta()
+                devolver_bicicleta()
             elif sistema == 0:
                 return 0
             else:
