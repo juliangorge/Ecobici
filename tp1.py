@@ -370,11 +370,11 @@ def menu(estaciones, bicicletas, usuarios):
             #Validacion vacío o alfanumérico
             sistema = int(input('Elige una opción para continuar: '))
             if sistema == 1:
-                return 0
+                #modificar_pin()
             elif sistema == 2:
                 estaciones, bicicletas, usuarios = retirar_bicicleta(estaciones, bicicletas, usuarios)
             elif sistema == 3:
-                return 0
+                #devolver_bicicleta()
             elif sistema == 0:
                 return 0
             else:
