@@ -272,7 +272,10 @@ def listar_usuarios(usuarios):
         print((indice+1), lista_usuarios[indice][0], lista_usuarios[indice][1] )
 
 
-### MAIN
+##############################
+#####     MAIN CODE      #####
+##############################
+
 import os
 
 def menu(estaciones, bicicletas, usuarios):
@@ -392,18 +395,13 @@ def menu(estaciones, bicicletas, usuarios):
             os.system('clear') ##Limpia la terminal
             print('Vuelva a intentarlo')
 
-
-##############################
-#####     MAIN CODE      #####
-##############################
-
 #Inicializo diccionarios
 estaciones = {}
 bicicletas = {}
 usuarios = {}
 usuarios_bloqueados = {}
 
-### Inicio
+### Arranco programa
 os.system('clear') ##Limpia la terminal
 print('¡Bienvenido!\n')
 menu(estaciones, bicicletas, usuarios)
