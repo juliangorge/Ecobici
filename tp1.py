@@ -273,7 +273,7 @@ def duracion_viajes():
 def bicicletas_reparacion(bicicletas):
     en_reparacion = 0
     for numero_bicicleta, estado in bicicletas.items():
-        if(estado[0] == 'reparacion'):
+        if(estado[1] == 'reparacion'):
             en_reparacion += 1
     print('Bicicletas en reparación: {}\n'.format(en_reparacion))
     
@@ -285,7 +285,9 @@ def top_estaciones(estaciones):
 ##############################
 
 def menu(estaciones, bicicletas, usuarios):
-    while True:
+    seguir = True
+    while seguir == True:
+        print('¡Bienvenido!\n')
         print('1 - Carga de datos')
         print('2 - Usuarios')
         print('3 - Retiros automáticos')
@@ -294,109 +296,111 @@ def menu(estaciones, bicicletas, usuarios):
         print('0 - Salir \n')
 
         #Si se ingresa un valor distinto, vuelve al menú raíz
-        opcion = int(input('Elige una opción para continuar: '))
-        
-        if opcion == 1:
-            print('a - Carga automática')
-            print('b - Carga automática aleatoria\n')
+        opcion = input('Elige una opción para continuar: ')
+
+        if opcion == 0:
+            seguir = False
+
+        elif opcion == '1':
+            print('1 - Carga automática')
+            print('2 - Carga automática aleatoria\n')
             print('0 - Salir \n')
 
             opcion = input('Elige una opción para continuar: ')
-            if opcion == 'a':
+            
+            while opcion not in ['1','2','0']:
+                print('La opción es incorrecta.\n')
+                opcion = input('Elige una opción para continuar: ')
+            if opcion == '1':
                 estaciones,bicicletas,usuarios = carga_datos_automatica(estaciones, bicicletas, usuarios)
                 os.system('clear') ##Limpia la terminal
                 print('Datos cargados!\n')
-            elif opcion == 'b':
+            elif opcion == '2':
                 estaciones,bicicletas,usuarios = carga_datos_random(estaciones, bicicletas, usuarios)
                 os.system('clear') ##Limpia la terminal
                 print('Datos aleatorios cargados!\n')
-            else:
+            elif opcion == '0':
                 os.system('clear') ##Limpia la terminal
-                print('La opción no existe.\n')
 
-        elif opcion == 2:
-            print('a - Listado')
-            print('b - Alta')
-            print('c - Modificación')
-            print('d - Desbloquear')
+        elif opcion == '2':
+            print('1 - Listado')
+            print('2 - Alta')
+            print('3 - Modificación')
+            print('4 - Desbloquear')
             print('0 - Salir \n')
 
             opcion = input('Elige una opción para continuar: ')
-            if opcion == 'a':
+            while opcion not in ['1','2','3','4','0']:
+                print('La opción es incorrecta.\n')
+                opcion = input('Elige una opción para continuar: ')
+            if opcion == '1':
                 listar_usuarios(usuarios)
-            elif opcion == 'b':
+            elif opcion == '2':
                 alta_usuario(usuarios)
-            elif opcion == 'c':
+            elif opcion == '3':
                 ingresar_usuario(usuarios)
-            elif opcion == 'd':
+            elif opcion == '4':
                 desbloquear_usuario(usuarios, usuarios_bloqueados)
             elif opcion == '0':
-                desbloquear_usuario(usuarios, usuarios_bloqueados)
-            else:
                 os.system('clear') ##Limpia la terminal
-                print('La opción no existe.\n')
 
-        elif opcion == 3:
-            print('a - Viaje aleatorio')
-            print('b - Viajes aleatorios múltiples')
+        elif opcion == '3':
+            print('1 - Viaje aleatorio')
+            print('2 - Viajes aleatorios múltiples')
             print('0 - Salir \n')
 
             opcion = input('Elige una opción para continuar: ')
-            if opcion == 'a':
+            while opcion not in ['1','2','0']:
+                print('La opción es incorrecta.\n')
+                opcion = input('Elige una opción para continuar: ')
+            if opcion == '1':
                 viaje_aleatorio()
-            elif opcion == 'b':
+            elif opcion == '2':
                 viaje_aleatorio_multiple()
             elif opcion == '0':
-                return 0
-            else:
                 os.system('clear') ##Limpia la terminal
-                print('La opción no existe.\n')
 
-        elif opcion == 4:
-            print('a - Usuarios con mayor cantidad de viajes')
-            print('b - Usuarios con mayor duración acumulada de viajes')
-            print('c - Bicicletas en reparación')
-            print('d - Estaciones más activas')
+        elif opcion == '4':
+            print('1 - Usuarios con mayor cantidad de viajes')
+            print('2 - Usuarios con mayor duración acumulada de viajes')
+            print('3 - Bicicletas en reparación')
+            print('4 - Estaciones más activas')
             print('0 - Salir \n')
 
             opcion = input('Elige una opción para continuar: ')
-            if opcion == 'a':
+            while opcion not in ['1','2','3','4','0']:
+                print('La opción es incorrecta.\n')
+                opcion = input('Elige una opción para continuar: ')
+            if opcion == '1':
                 cantidad_viajes()
-            elif opcion == 'b':
+            elif opcion == '2':
                 duracion_viajes()
-            elif opcion == 'c':
+            elif opcion == '3':
                 bicicletas_reparacion(bicicletas)
-            elif opcion == 'd':
+            elif opcion == '4':
                 top_estaciones(estaciones)
             elif opcion == '0':
-                return 0
-            else:
                 os.system('clear') ##Limpia la terminal
-                print('La opción no existe.\n')
 
-        elif opcion == 5:
+        elif opcion == '5':
             ##Ingreso al sistema
             print('1 - Modificar PIN')
             print('2 - Retirar Bicicleta')
             print('3 - Devolver bicicletas')
             print('0 - Salir \n')
-            
-            #Validacion vacío o alfanumérico
-            sistema = int(input('Elige una opción para continuar: '))
-            if sistema == 1:
-                modificar_pin()
-            elif sistema == 2:
-                estaciones, bicicletas, usuarios = retirar_bicicleta(estaciones, bicicletas, usuarios)
-            elif sistema == 3:
-                devolver_bicicleta()
-            elif sistema == 0:
-                return 0
-            else:
-                os.system('clear') ##Limpia la terminal
-                print('La opción no existe.\n')
 
-        elif opcion == 0:
-            return False
+            opcion = input('Elige una opción para continuar: ')
+            while opcion not in ['1','2','3','0']:
+                print('La opción es incorrecta.\n')
+                opcion = input('Elige una opción para continuar: ')
+            if opcion == '1':
+                modificar_pin()
+            elif opcion == '2':
+                estaciones, bicicletas, usuarios = retirar_bicicleta(estaciones, bicicletas, usuarios)
+            elif opcion == '3':
+                devolver_bicicleta()
+            elif opcion == '0':
+                os.system('clear') ##Limpia la terminal
         else:
             os.system('clear') ##Limpia la terminal
             print('Vuelva a intentarlo')
@@ -409,5 +413,4 @@ usuarios_bloqueados = {}
 
 ### Arranco programa
 os.system('clear') ##Limpia la terminal
-print('¡Bienvenido!\n')
 menu(estaciones, bicicletas, usuarios)
