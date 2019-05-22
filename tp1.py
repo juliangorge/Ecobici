@@ -255,7 +255,7 @@ def cargar_bicicletas(estaciones, bicicletas):
     #si es el primer elemento, id  = 1000 y sino len()+1
     numero_estaciones = 1
     for numero_bicicleta in range(1000,1251):
-        if numero_bicicleta < 1240:
+        if numero_bicicleta < 1241:
             estado = "ok"
         else:
             estado = "reparacion"
@@ -276,7 +276,7 @@ def cargar_bicicletas(estaciones, bicicletas):
 
 def cargar_bicicletas_random(estaciones, bicicletas):
     for numero_bicicleta in range(1000,1251):
-        if numero_bicicleta < 1240:
+        if numero_bicicleta < 1241:
             estado = "ok"
         else:
             estado = "reparacion"
