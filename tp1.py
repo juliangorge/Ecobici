@@ -259,8 +259,10 @@ def cargar_bicicletas(estaciones, bicicletas):
             estado = "ok"
         else:
             estado = "reparacion"
+
         if estado == "reparacion":
             ubicacion = "reparacion"
+            bicicletas_en_reparacion.append(numero_bicicleta)
         else:
             ubicacion = "anclada"
             if len(estaciones[numero_estaciones][3]) < 30:
@@ -270,7 +272,7 @@ def cargar_bicicletas(estaciones, bicicletas):
                 estaciones[numero_estaciones][3].append(numero_bicicleta)
                 print(estaciones[numero_estaciones])
 
-        bicicletas[numero_bicicleta] = [estado,ubicacion]
+            bicicletas[numero_bicicleta] = [estado, ubicacion]
 
 def cargar_bicicletas_random(estaciones, bicicletas):
     for numero_bicicleta in range(1000,1251):
@@ -320,12 +322,8 @@ def cantidad_viajes():
     return 0
 def duracion_viajes():
     return 0
-def bicicletas_reparacion(bicicletas):
-    en_reparacion = 0
-    for numero_bicicleta, estado in bicicletas.items():
-        if(estado[1] == 'reparacion'):
-            en_reparacion += 1
-    print('Bicicletas en reparación: {}\n'.format(en_reparacion))
+def bicicletas_reparacion(bicicletas_en_reparacion):
+    print('Bicicletas en reparación: {}\n'.format(len(bicicletas_en_reparacion)))
     
 def top_estaciones(estaciones):
     return 0
@@ -426,7 +424,7 @@ def menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales,
             elif opcion == '2':
                 duracion_viajes()
             elif opcion == '3':
-                bicicletas_reparacion(bicicletas)
+                bicicletas_reparacion(bicicletas_en_reparacion)
             elif opcion == '4':
                 top_estaciones(estaciones)
             elif opcion == '0':
@@ -475,7 +473,7 @@ usuarios = {}
 usuarios_bloqueados = {}
 viajes_actuales = {}
 viajes_finalizados = {}
-bicicletas_en_reparacion ={}
+bicicletas_en_reparacion = []
 
 ### Arranco programa
 os.system('clear') ##Limpia la terminal
