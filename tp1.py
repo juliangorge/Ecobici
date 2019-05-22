@@ -154,11 +154,11 @@ def validar_bloqueo(usuarios):
 
 def retirar_bicicleta(estaciones, bicicletas, usuarios):
     #Validación ¿y si es vacío o alfanumérico?
-    estacion = int(input('Seleccione número de estación: '))
+    estacion = input('Seleccione número de estación: ')
     #Verificar estación
     claves = estaciones.keys()
-    while not estacion in claves:
-        estacion = int(input('Seleccione número de estación: '))
+    while not estacion in claves or not estacion.isdigit():
+        estacion = input('Seleccione un número de estación correcto: ')
     #Ingrese su DNI y PIN (3 reintentos sino bloquear usuario)    
     usuarios,dni =  validar_bloqueo(usuarios)        
     numero_anclaje = 0
