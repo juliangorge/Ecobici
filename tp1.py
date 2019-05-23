@@ -61,8 +61,10 @@ def validar_pin (mensaje):
     return validar_pin("Ingrese un pin correcto: ")
 
 def bloquear_usuario(dni,usuarios,usuarios_bloqueados):
-    print("aca se bloquea el usuario")
-    return 0
+    usuarios_bloqueados.append(dni)
+    usuarios[dni][2] = None
+    print('Usuario bloqueado!')
+    return (usuarios,usuarios_bloqueados)
 
 def validar_nombre (mensaje):
     nombre = input (mensaje)
@@ -89,7 +91,7 @@ def ingresar_usuario (usuarios):
     pin = validar_pin("Ingrese su pin: ")
     existencia_usuario =  validar_usuario(dni,pin,usuarios)
     if existencia_usuario == "existe":
-        print ("Bienvenido ", usuarios[dni[0]])
+        #print ("Bienvenido ", usuarios[dni[0]])
         usuarios = modificar_pin(dni,usuarios)
         print(usuarios)
         return (usuarios) 
@@ -125,7 +127,7 @@ def desbloquear_usuario(usuarios, usuarios_bloqueados):
     claves_usuarios = usuarios_bloqueados.keys()
     for i in usuarios_bloqueados:
         print ((i+1), usuarios_bloqueados[i])
-    usuario_a_desbloquear = validar_dni('Ingrese el usuario a desbloquear: ')
+    usuario_a_desbloquear = validar_dni('Ingrese el dni del usuario a desbloquear: ')
 
     if usuario_a_desbloquear in claves_usuarios:
         palabra_secreta = input ("Ingrese la palabra secreta: ")
@@ -139,6 +141,7 @@ def desbloquear_usuario(usuarios, usuarios_bloqueados):
             palabra_secreta = input ("La clave ha sido incorrecta. Ingresela nuevamente: ")
     else:
         print ("Su usuario no esta bloqueado.")
+        return(usuarios, usuarios_bloqueados)
     
 #Sólo cuenta las veces que entra a validar: en 3 -> BLOQUEAR
 def validar_bloqueo(usuarios):
@@ -605,7 +608,7 @@ def menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales,
 estaciones = {}
 bicicletas = {}
 usuarios = {}
-usuarios_bloqueados = {}
+usuarios_bloqueados = []
 viajes_actuales = {}
 viajes_finalizados = {}
 bicicletas_en_reparacion = []
