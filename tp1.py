@@ -419,6 +419,7 @@ def cargar_bicicletas_random(estaciones, bicicletas):
             estado = "reparacion"
         if estado == "reparacion":
             ubicacion = "reparacion"
+            bicicletas_en_reparacion.append(numero_bicicleta)
         else:
             ubicacion = "anclada"
             numero_estacion = randint(1,10)
