@@ -126,19 +126,18 @@ def modificar_pin(dni,usuarios):
 
 def desbloquear_usuario(usuarios, usuarios_bloqueados):
     for usuario in usuarios_bloqueados:
-        print (usuario)
+        print (usuario, usuarios[usuario][0])
     usuario_a_desbloquear = validar_dni('Ingrese el dni del usuario a desbloquear: ')
 
     if usuario_a_desbloquear in usuarios_bloqueados:
         palabra_secreta = input ("Ingrese la palabra secreta: ")
-        if palabra_secreta == 'shimano': 
-            print ("Su usuario ha sido desbloqueado.")
-            usuarios_bloqueados.remove(usuario_a_desbloquear)
-            usuarios[usuario_a_desbloquear][2] = randint(1000,9999)
-            print('Su nuevo pin es: ',usuarios[usuario_a_desbloquear][2])
-            return usuarios, usuarios_bloqueados
-        else: 
+        while not palabra_secreta == 'shimano':    
             palabra_secreta = input ("La clave ha sido incorrecta. Ingresela nuevamente: ")
+        print ("Su usuario ha sido desbloqueado.")
+        usuarios_bloqueados.remove(usuario_a_desbloquear)
+        usuarios[usuario_a_desbloquear][2] = randint(1000,9999)
+        print('Su nuevo pin es: ',usuarios[usuario_a_desbloquear][2])
+        return usuarios, usuarios_bloqueados    
     else:
         print ("Su usuario no está bloqueado.")
         return(usuarios, usuarios_bloqueados)
@@ -254,101 +253,111 @@ def devolver_bicicleta(dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloq
 
     print("No hay anclajes disponibles.\n")
 
-def seleccionar_usuario(usuarios, viajes_actuales):
-    usuario_a_viajar = 0
+def seleccionar_usuario(usuarios, viajes_actuales,usuarios_bloqueados):
+    usuario_a_viajar = -1
     lista_usuarios = []
     for usuario in usuarios:
         lista_usuarios.append([usuario, usuarios[usuario][2]])
     indice_usuario = 0
     if (len(usuarios) == 0):
         print("No hay usuarios")
+        return usuario_a_viajar
     else: 
-        while usuario_a_viajar  == 0:
+        listado_pins = []
+        while usuario_a_viajar == -1:
             indice_usuario = randint(0,(len(lista_usuarios)-1))
-            if lista_usuarios[indice_usuario][1] != None and lista_usuarios[indice_usuario][0] not in viajes_actuales and indice_usuario <= len(usuarios):
-                usuario_a_viajar =  lista_usuarios[indice_usuario][0]
-            #else:
-            #   indice_usuario +=1
+            if lista_usuarios[indice_usuario][0] not in usuarios_bloqueados and lista_usuarios[indice_usuario][0] not in viajes_actuales:
+                usuario_a_viajar = usuario_a_viajar =  lista_usuarios[indice_usuario][0]
+            else:
+                if indice_usuario not in listado_pins:
+                    listado_pins.append(indice_usuario)
+                if len(listado_pins) == len (lista_usuarios):
+                    #print(listado_pins)
+                    return(usuario_a_viajar)
         return (usuario_a_viajar)
 def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
     
     for numero_ejecucion in range(0,int(cantidad_ejecuciones)):
-        dni = seleccionar_usuario(usuarios,viajes_actuales)
-        estacion =randint(1,10)
-        #saco bici
-        if(len(viajes_actuales) and len(viajes_actuales[dni]) > 0):
-            print('Usted ya tiene una bicicleta!')
+        dni = seleccionar_usuario(usuarios,viajes_actuales,usuarios_bloqueados)
+        if dni != -1:
+            estacion =randint(1,10)
+            #saco bici
+            
+            if(len(viajes_actuales) and len(viajes_actuales[dni]) > 0):
+                print('Usted ya tiene una bicicleta!')
+            else:
+                numero_anclaje = 0
+                while len(estaciones[estacion][3]) >= numero_anclaje:
+                    if(len(estaciones[estacion][3]) > 0):
+                        numero_bicicleta = estaciones[estacion][3][0]
+                        if(bicicletas[numero_bicicleta][0] == "ok"):
+                            bicicletas[numero_bicicleta][1] = "En circulación"
+                            estaciones[estacion][3].remove(numero_bicicleta)
+                            
+                            numero_anclaje = 31 #Salgo de while
+
+                            hora = randint(0,22)
+                            if(hora == 22):
+                                minuto = randint(0,30) 
+                            else:
+                                minuto = randint(0,59)
+                            if minuto <10:
+                                horario_salida = str(hora) + ': 0' + str(minuto)
+                            else:
+                                horario_salida = str(hora) + ':' + str(minuto)
+                            #horario_salida = str(hora) + ':' + str(minuto)
+                            estaciones[estacion][4] +=1
+                            print (numero_ejecucion+1)
+                            print("{} retiro la bicicleta {} de la estación {} ubicada en {}, a las {}\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_salida))
+                            viajes_actuales[int(dni)] = [numero_bicicleta, estacion, horario_salida]    
+                    else:
+                        print ("No hay bicicleta disponible, intente en otra estación")
+                    numero_anclaje += 1
+
+                estacion_devolucion = estacion
+                while estacion_devolucion == estacion  and len(estaciones[estacion_devolucion][3]) >= estaciones[estacion_devolucion][2]:
+                    estacion_devolucion = randint(1,10)
+                #devuelvo bici
+                #devolver_bicicleta(dni,estacion_devolucion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+                seguir = True
+                while len(estaciones[estacion_devolucion][3]) < estaciones[estacion_devolucion][2] and seguir  ==True:
+                    duracion_viaje = randint(5,75)
+                    if duracion_viaje > 60:
+                        bloquear_usuario(dni,usuarios,usuarios_bloqueados)
+                    
+                    numero_bicicleta = viajes_actuales[dni][0]
+                    bicicletas[numero_bicicleta][1] = "anclada"
+
+                    horario = viajes_actuales[dni][2].split(':')
+                    hora = int(horario[0])
+                    minuto = int(horario[1])
+                    if( (minuto + duracion_viaje ) >= 60 ):
+                        minuto += (duracion_viaje - 60)
+                        hora += 1
+                    else:
+                        minuto += duracion_viaje
+
+                    if minuto <10:
+                        horario_llegada = str(hora) + ': 0' + str(minuto)
+                    else:
+                        horario_llegada = str(hora) + ':' + str(minuto)
+                    del viajes_actuales[dni]
+                    
+                    usuarios[dni][3] += duracion_viaje
+                    usuarios[dni][4] += 1
+                    estaciones[estacion_devolucion][3].append(numero_bicicleta)
+                    viajes_finalizados[dni] = [numero_bicicleta, horario_llegada, estacion]
+                    estaciones[estacion_devolucion][4] += 1 
+                    if duracion_viaje > 60:
+                            print(" {} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}. Al exceder los 60 minutos de uso ha sido bloqueado.\n".format(usuarios[dni][0],numero_bicicleta, estacion_devolucion,estaciones[estacion][0],horario_llegada))
+                    else:
+                        print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}.\n".format(usuarios[dni][0],numero_bicicleta, estacion_devolucion,estaciones[estacion][0],horario_llegada))
+                    seguir =False        
+                if len(estaciones[estacion_devolucion][3]) >= estaciones[estacion_devolucion][2]:
+                    print("No hay anclajes disponibles")
+                    seguir = False
         else:
-            numero_anclaje = 0
-            while len(estaciones[estacion][3]) >= numero_anclaje:
-                if(len(estaciones[estacion][3]) > 0):
-                    numero_bicicleta = estaciones[estacion][3][0]
-                    if(bicicletas[numero_bicicleta][0] == "ok"):
-                        bicicletas[numero_bicicleta][1] = "En circulación"
-                        estaciones[estacion][3].remove(numero_bicicleta)
-                        
-                        numero_anclaje = 31 #Salgo de while
-
-                        hora = randint(0,22)
-                        if(hora == 22):
-                            minuto = randint(0,30) 
-                        else:
-                            minuto = randint(0,59)
-                        if minuto <10:
-                            horario_salida = str(hora) + ': 0' + str(minuto)
-                        else:
-                            horario_salida = str(hora) + ':' + str(minuto)
-                        #horario_salida = str(hora) + ':' + str(minuto)
-                        estaciones[estacion][4] +=1
-                        print (numero_ejecucion+1)
-                        print("{} retiro la bicicleta {} de la estación {} ubicada en {}, a las {}\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_salida))
-                        viajes_actuales[int(dni)] = [numero_bicicleta, estacion, horario_salida]    
-                else:
-                    print ("No hay bicicleta disponible, intente en otra estación")
-                numero_anclaje += 1
-
-            estacion_devolucion = estacion
-            while estacion_devolucion == estacion  and len(estaciones[estacion_devolucion][3]) >= estaciones[estacion_devolucion][2]:
-                estacion_devolucion = randint(1,10)
-            #devuelvo bici
-            #devolver_bicicleta(dni,estacion_devolucion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
-            seguir = True
-            while len(estaciones[estacion_devolucion][3]) < estaciones[estacion_devolucion][2] and seguir  ==True:
-                duracion_viaje = randint(5,75)
-                if duracion_viaje > 60:
-                    bloquear_usuario(dni,usuarios,usuarios_bloqueados)
-                
-                numero_bicicleta = viajes_actuales[dni][0]
-                bicicletas[numero_bicicleta][1] = "anclada"
-
-                horario = viajes_actuales[dni][2].split(':')
-                hora = int(horario[0])
-                minuto = int(horario[1])
-                if( (minuto + duracion_viaje ) >= 60 ):
-                    minuto += (duracion_viaje - 60)
-                    hora += 1
-                else:
-                    minuto += duracion_viaje
-
-                if minuto <10:
-                    horario_llegada = str(hora) + ': 0' + str(minuto)
-                else:
-                    horario_llegada = str(hora) + ':' + str(minuto)
-                del viajes_actuales[dni]
-                
-                usuarios[dni][3] += duracion_viaje
-                usuarios[dni][4] += 1
-                estaciones[estacion_devolucion][3].append(numero_bicicleta)
-                viajes_finalizados[dni] = [numero_bicicleta, horario_llegada, estacion]
-                estaciones[estacion_devolucion][4] += 1 
-                if duracion_viaje > 60:
-                        print(" {} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}. Al exceder los 60 minutos de uso ha sido bloqueado.\n".format(usuarios[dni][0],numero_bicicleta, estacion_devolucion,estaciones[estacion][0],horario_llegada))
-                else:
-                    print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}.\n".format(usuarios[dni][0],numero_bicicleta, estacion_devolucion,estaciones[estacion][0],horario_llegada))
-                seguir =False        
-            if len(estaciones[estacion_devolucion][3]) >= estaciones[estacion_devolucion][2]:
-                print("No hay anclajes disponibles")
-                seguir = False
+            print("No hay usuarios disponibles")    
     return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
     
 def simulacion_con_parametro(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
