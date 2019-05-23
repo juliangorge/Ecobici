@@ -182,6 +182,8 @@ def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales):
                     horario_salida = str(hora) + ':' + str(minuto)
 
                     viajes_actuales[dni] = [numero_bicicleta, estacion, horario_salida]
+                    estaciones[estacion][4] += 1
+                    
                     return (estaciones, bicicletas, usuarios, viajes_actuales)
             else:
                 print ("No hay bicicleta disponible, intente en otra estación")
@@ -219,8 +221,10 @@ def devolver_bicicleta(dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloq
         del viajes_actuales[dni]
         
         usuarios[dni][3] += duracion_viaje
+        usuarios[dni][4] += 1
         estaciones[estacion][3].append(numero_bicicleta)
         viajes_finalizados[dni] = [numero_bicicleta, horario_llegada, estacion]
+        estaciones[estacion][4] += 1 
         if duracion_viaje > 60:
                 print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}. Al exceder los 60 minutos de uso ha sido bloqueado.\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_llegada))
         else:
@@ -268,6 +272,7 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
                             minuto = randint(0,59)
 
                         horario_salida = str(hora) + ':' + str(minuto)
+                        estaciones[estacion][4] +=1
                         print("{} retiro la bicicleta {} de la estación {} ubicada en {}, a las {}\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_salida))
                         viajes_actuales[dni] = [numero_bicicleta, estacion, horario_salida]    
                 else:
@@ -301,14 +306,14 @@ def cargar_estaciones(estaciones):
     coordenadas = (" {} , {}". format(latitud,(longitud)))
     capacidad = 30
     bicicletas_ancladas = []
-
+    cantidad_usos_estacion = 0
     for i in range(1,11):
         if i != 1:
             direccion = "Av. Rivadavia {} ".format(numero_direccion + 100) #suma 100mts a la anterior direccion
             #20 segundos = 100mts
             coordenadas = (" {} / {}". format(latitud,(longitud+0.0020)))
             bicicletas_ancladas = []
-        estaciones[i] = [direccion,coordenadas,capacidad,bicicletas_ancladas]
+        estaciones[i] = [direccion,coordenadas,capacidad,bicicletas_ancladas,cantidad_usos_estacion]
 
 def cargar_bicicletas(estaciones, bicicletas):
     #si es el primer elemento, id  = 1000 y sino len()+1
@@ -354,6 +359,7 @@ def cargar_usuario(usuarios):
     tiempo_de_viaje = 0
     dni = 9999999
     pin = 1000
+    cantidad_viajes = 0
     for i in range(1,6):
         nombre = pre_nombres[i-1]
         celular = pre_celular[i-1]
@@ -361,7 +367,7 @@ def cargar_usuario(usuarios):
         dni += 1
         pin += 10
 
-        usuarios[dni] = [nombre,celular,pin,tiempo_de_viaje]
+        usuarios[dni] = [nombre,celular,pin,tiempo_de_viaje,cantidad_viajes]
 
 def mostrar_bicicletas(bicicletas):
     for bici in bicicletas:
@@ -377,15 +383,39 @@ def listar_usuarios(usuarios):
     for indice in range(0,len(lista_usuarios)):
         print((indice+1), lista_usuarios[indice][0], lista_usuarios[indice][1] )
 
-def cantidad_viajes():
-    return 0
-def duracion_viajes():
-    return 0
+def informe_duracion_viajes (usuarios):
+    usuarios_top_cinco = []
+    claves_usuarios = usuarios.keys()
+    #usuarios[dni][3] --> duracion de los viajes del usuario
+    for usuario in claves_usuarios:
+        usuarios_top_cinco.append ([usuario, usuario[3]])
+    usuarios_top_cinco.sort (key = lambda usuario:usuario[1], reverse = True)
+    for i in range (0,5):
+        print ((i+1), "-", usuarios_top_cinco [0], usuarios_top_cinco[1], "minutos")
+
+def informe_cantidad_viajes(usuarios):
+    usuarios_top_diez = []
+    claves_usuarios = usuarios.keys()
+    #usuarios[dni][4] --> cantidad viajes usuario
+    for usuario in claves_usuarios:
+        usuarios_top_diez.append ([usuario, usuario[4]])
+    usuarios_top_diez.sort (key = lambda usuario:usuario[1], reverse = True)
+    for i in range (0,5):
+        print ((i+1), "-", usuarios_top_diez [0], usuarios_top_diez[1], "viajes")
+
 def bicicletas_reparacion(bicicletas_en_reparacion):
     print('Bicicletas en reparación: {}\n'.format(len(bicicletas_en_reparacion)))
-    
-def top_estaciones(estaciones):
-    return 0
+    for bicicleta in bicicletas_en_reparacion:
+        print(bicicleta)
+
+def top_estaciones (estaciones):
+    top_estaciones_activas = []
+    claves_estaciones = estaciones.keys()
+    for estacion in claves_estaciones:
+        top_estaciones_activas.append ([estacion, estacion[4]])
+    top_estaciones_activas.sort (key = lambda estacion:estacion[1], reverse = True)
+    for i in range (0,11):
+        print ((i+1), "-", top_estaciones_activas [0])
 
 ##############################
 #####     MAIN CODE      #####
@@ -479,9 +509,9 @@ def menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales,
                 print('La opción es incorrecta.\n')
                 opcion = input('Elige una opción para continuar: ')
             if opcion == '1':
-                cantidad_viajes()
+                informe_cantidad_viajes(usuarios)
             elif opcion == '2':
-                duracion_viajes()
+                informe_duracion_viajes(usuarios)
             elif opcion == '3':
                 bicicletas_reparacion(bicicletas_en_reparacion)
             elif opcion == '4':

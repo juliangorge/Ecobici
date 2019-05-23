@@ -1,6 +1,6 @@
 
 #b. Top 5 de usuarios de bicicleta, por duración acumulada de los viaje
-def top_cinco_duracion (usuarios):
+def informe_duracion_viajes (usuarios):
     usuarios_top_cinco = []
     claves_usuarios = usuarios.keys()
 #usuarios[dni][3] --> duracion de los viajes del usuario
@@ -12,7 +12,7 @@ def top_cinco_duracion (usuarios):
 #d. Top de estaciones más activas: se entiende por “actividad” a la extracción y la devolución de bicicletas
     #
     # estaciones[i] =  [direccion,coordenadas,capacidad,bicicletas_ancladas,cantidad_de_usos]
-def estaciones_mas_activas (estaciones):
+def top_estaciones (estaciones):
     top_estaciones_activas = []
     claves_estaciones = estaciones.keys()
     for estacion in claves_estaciones:
