@@ -168,7 +168,7 @@ def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuario
     if(len(viajes_actuales) and len(viajes_actuales[dni]) > 0):
         print('Usted ya tiene una bicicleta!')
     else:
-        if(dni[0] not in usuarios_bloqueados):
+        if(dni not in usuarios_bloqueados):
             estacion = input('Seleccione número de estación: ')
             claves = estaciones.keys()
             while not int(estacion) in claves or not estacion.isdigit():
@@ -196,7 +196,7 @@ def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuario
                         viajes_actuales[dni] = [numero_bicicleta, estacion, horario_salida]
                         estaciones[estacion][4] += 1
                         
-                        return (estaciones, bicicletas, usuarios, viajes_actuales)
+                        return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
                 else:
                     print ("No hay bicicleta disponible, intente en otra estación")
                 numero_anclaje += 1
@@ -307,7 +307,7 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
                 bloquear_usuario(dni,usuarios,usuarios_bloqueados)
             
             bicicletas[numero_bicicleta][1] = "anclada"
-
+    
             horario = viajes_actuales[dni][2].split(':')
             hora = int(horario[0])
             minuto = int(horario[1])
@@ -317,12 +317,12 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
             else:
                 minuto += duracion_viaje
 
-            if minuto <10:
+            if minuto < 10:
                 horario_llegada = str(hora) + ': 0' + str(minuto)
             else:
                 horario_llegada = str(hora) + ':' + str(minuto)
             del viajes_actuales[dni]
-            
+
             usuarios[dni][3] += duracion_viaje
             usuarios[dni][4] += 1
             estaciones[estacion][3].append(numero_bicicleta)
@@ -437,20 +437,22 @@ def informe_duracion_viajes (usuarios):
     claves_usuarios = usuarios.keys()
     #usuarios[dni][3] --> duracion de los viajes del usuario
     for usuario in claves_usuarios:
-        usuarios_top_cinco.append ([usuario, usuario[3]])
+        usuarios_top_cinco.append([usuario, usuarios[usuario][0], usuarios[usuario][3]])
     usuarios_top_cinco.sort (key = lambda usuario:usuario[1], reverse = True)
     for i in range (0,5):
-        print ((i+1), "-", usuarios_top_cinco [0], usuarios_top_cinco[1], "minutos")
+        print ((i+1), "-", usuarios_top_cinco[i][1], '(' , usuarios_top_cinco[i][0], ') con' , usuarios_top_cinco[i][2], "minutos\n")
 
 def informe_cantidad_viajes(usuarios):
     usuarios_top_diez = []
     claves_usuarios = usuarios.keys()
     #usuarios[dni][4] --> cantidad viajes usuario
-    for usuario in claves_usuarios:
-        usuarios_top_diez.append ([usuario, usuario[4]])
+
+    for usuario in usuarios:
+        usuarios_top_diez.append([usuario, usuarios[usuario][0], usuarios[usuario][4]])
     usuarios_top_diez.sort (key = lambda usuario:usuario[1], reverse = True)
-    for i in range (0,5):
-        print ((i+1), "-", usuarios_top_diez [0], usuarios_top_diez[1], "viajes")
+    for i in range (0,len(usuarios_top_diez)):
+        if(i <= 10):
+            print ((i+1), "-", usuarios_top_diez[i][1], '(' , usuarios_top_diez[i][0] , ') con' , usuarios_top_diez[i][2], "viajes\n")
 
 def bicicletas_reparacion(bicicletas_en_reparacion):
     print('Bicicletas en reparación: {}\n'.format(len(bicicletas_en_reparacion)))
@@ -461,11 +463,10 @@ def top_estaciones (estaciones):
     top_estaciones_activas = []
     claves_estaciones = estaciones.keys()
     for estacion in claves_estaciones:
-        top_estaciones_activas.append ([estacion, estacion[4]])
+        top_estaciones_activas.append([estacion, estaciones[estacion][4]])
     top_estaciones_activas.sort (key = lambda estacion:estacion[1], reverse = True)
-    for i in range (0,11):
-        print ((i+1), "-", top_estaciones_activas [0])
-
+    for i in range (0,10):
+        print ((i+1) , "- Estacion: #" , top_estaciones_activas[i][0], 'con', top_estaciones_activas[i][1], 'usos')
 ##############################
 #####     MAIN CODE      #####
 ##############################
