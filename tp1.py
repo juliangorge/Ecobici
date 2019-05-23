@@ -33,13 +33,17 @@ def carga_datos_random(estaciones, bicicletas, usuarios):
 
 def alta_usuario(usuarios):
     dni = validar_dni ("Ingrese su DNI: ")
-    pin = validar_pin ("Ingrese su pin: ")
-    nombre = validar_nombre ("Ingrese su nombre y apellido: ")
-    celular = validar_celular ("Ingrese su numero de celular: ")
-    duracion_viaje = 0
-    cantidad_viajes =0
-    usuarios[dni] = [nombre,celular,pin,duracion_viaje, cantidad_viajes]
-
+    while not dni in usuarios:
+        pin = validar_pin ("Ingrese su pin: ")
+        nombre = validar_nombre ("Ingrese su nombre y apellido: ")
+        celular = validar_celular ("Ingrese su numero de celular: ")
+        duracion_viaje = 0
+        cantidad_viajes =0
+        usuarios[dni] = [nombre,celular,pin,duracion_viaje, cantidad_viajes]
+        print(usuarios)
+        return(usuarios)
+    print("Usted ya tiene un usuario")
+    return(usuarios)    
 def validar_dni (mensaje):
     dni = input (mensaje)
     while  dni.isdigit() and len (dni) == 7 or len (dni) == 8 :
@@ -88,13 +92,14 @@ def ingresar_usuario (usuarios):
         print ("Bienvenido ", usuarios[dni[0]])
         usuarios = modificar_pin(dni,usuarios)
         print(usuarios)
+        return (usuarios) 
     elif existencia_usuario == "pin incorrecto":
         print("El PIN es incorrecto")
-        ingresar_usuario(usuarios)
+        return ingresar_usuario(usuarios)
     elif existencia_usuario == "no existe":
         print("El dni es incorrecto o usted no tiene un usuario")
-        ingresar_usuario(usuarios)
-       
+        return ingresar_usuario(usuarios)
+      
 def validar_usuario(dni,pin,usuarios):
     claves = usuarios.keys()
     if not dni in claves:
@@ -475,9 +480,9 @@ def menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales,
             if opcion == '1':
                 listar_usuarios(usuarios)
             elif opcion == '2':
-                alta_usuario(usuarios)
+                usuarios = alta_usuario(usuarios)
             elif opcion == '3':
-                ingresar_usuario(usuarios)
+                usuarios = ingresar_usuario(usuarios)
             elif opcion == '4':
                 usuarios,usuarios_bloqueados =desbloquear_usuario(usuarios, usuarios_bloqueados)
             elif opcion == '0':
@@ -533,7 +538,7 @@ def menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales,
                 print('La opción es incorrecta.\n')
                 opcion = input('Elige una opción para continuar: ')
             if opcion == '1':
-                ingresar_usuario(usuarios)
+                usuarios = ingresar_usuario(usuarios)
             elif opcion == '2':
                 estaciones, bicicletas, usuarios, viajes_actuales = retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales)    
             elif opcion == '3':
