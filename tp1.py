@@ -51,8 +51,7 @@ def validar_dni (mensaje):
         return int(dni)
     return validar_dni("El DNI es incorrecto, ingreselo nuevamente: ")    
 
-###########
-#### VALIDAR QUE EL DNI EXISTE
+
 
 def validar_pin (mensaje):
     pin = input (mensaje)
@@ -206,10 +205,7 @@ def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuario
                 numero_anclaje += 1
     return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
 
-def viaje_aleatorio():
-    return 0
-def viaje_aleatorio_multiple():
-    return 0       
+   
 def devolver_bicicleta(dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
 
     while len(estaciones[estacion][3]) < estaciones[estacion][2]:
