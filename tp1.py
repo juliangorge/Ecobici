@@ -14,6 +14,7 @@ def carga_datos_automatica(estaciones, bicicletas, usuarios):
     cargar_estaciones(estaciones)
     cargar_usuario(usuarios)
     cargar_bicicletas(estaciones, bicicletas)
+
     return (estaciones,bicicletas,usuarios)
 
 def carga_datos_random(estaciones, bicicletas, usuarios):
@@ -124,12 +125,11 @@ def modificar_pin(dni,usuarios):
     return (usuarios)
 
 def desbloquear_usuario(usuarios, usuarios_bloqueados):
-    claves_usuarios = usuarios_bloqueados.keys()
-    for i in usuarios_bloqueados:
-        print ((i+1), usuarios_bloqueados[i])
+    for usuario in usuarios_bloqueados:
+        print (usuario)
     usuario_a_desbloquear = validar_dni('Ingrese el dni del usuario a desbloquear: ')
 
-    if usuario_a_desbloquear in claves_usuarios:
+    if usuario_a_desbloquear in usuarios_bloqueados:
         palabra_secreta = input ("Ingrese la palabra secreta: ")
         if palabra_secreta == 'shimano': 
             print ("Su usuario ha sido desbloqueado.")
@@ -140,7 +140,7 @@ def desbloquear_usuario(usuarios, usuarios_bloqueados):
         else: 
             palabra_secreta = input ("La clave ha sido incorrecta. Ingresela nuevamente: ")
     else:
-        print ("Su usuario no esta bloqueado.")
+        print ("Su usuario no está bloqueado.")
         return(usuarios, usuarios_bloqueados)
     
 #Sólo cuenta las veces que entra a validar: en 3 -> BLOQUEAR
@@ -150,7 +150,8 @@ def validar_bloqueo(usuarios):
     while not dni in claves_usuarios:
         print("El usuario no existe, ingrese un usuario valido ")
         return validar_bloqueo(usuarios)
-    intentos = 0
+    #Considerando el primer INGRESO como intento nº1
+    intentos = 2
     pin = validar_pin("Ingrese su pin: ")
     while usuarios[dni][2] != pin:
         if(intentos <= 3):
@@ -162,43 +163,44 @@ def validar_bloqueo(usuarios):
     return(usuarios,dni)
 ##verificar si existe estacion
 
-def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales):
+def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados):
     usuarios,dni = validar_bloqueo(usuarios)
     if(len(viajes_actuales) and len(viajes_actuales[dni]) > 0):
         print('Usted ya tiene una bicicleta!')
     else:
-        estacion = input('Seleccione número de estación: ')
-        claves = estaciones.keys()
-        while not int(estacion) in claves or not estacion.isdigit():
-            estacion = input('Seleccione un número de estación correcto: ')
-        estacion = int(estacion)
-        
-        numero_anclaje = 0
-        while len(estaciones[estacion][3]) >= numero_anclaje:
-            if(len(estaciones[estacion][3]) > 0):
-                numero_bicicleta = estaciones[estacion][3][0]
-                if(bicicletas[numero_bicicleta][0] == "ok"):
-                    bicicletas[numero_bicicleta][1] = "En circulación"
-                    estaciones[estacion][3].remove(numero_bicicleta)
-                    print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje))
-                    numero_anclaje = 31 #Salgo de while
+        if(dni[0] not in usuarios_bloqueados):
+            estacion = input('Seleccione número de estación: ')
+            claves = estaciones.keys()
+            while not int(estacion) in claves or not estacion.isdigit():
+                estacion = input('Seleccione un número de estación correcto: ')
+            estacion = int(estacion)
+            
+            numero_anclaje = 0
+            while len(estaciones[estacion][3]) >= numero_anclaje:
+                if(len(estaciones[estacion][3]) > 0):
+                    numero_bicicleta = estaciones[estacion][3][0]
+                    if(bicicletas[numero_bicicleta][0] == "ok"):
+                        bicicletas[numero_bicicleta][1] = "En circulación"
+                        estaciones[estacion][3].remove(numero_bicicleta)
+                        print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje))
+                        numero_anclaje = 31 #Salgo de while
 
-                    hora = randint(0,22)
-                    if(hora == 22):
-                        minuto = randint(0,30) 
-                    else:
-                        minuto = randint(0,59)
+                        hora = randint(0,22)
+                        if(hora == 22):
+                            minuto = randint(0,30) 
+                        else:
+                            minuto = randint(0,59)
 
-                    horario_salida = str(hora) + ':' + str(minuto)
+                        horario_salida = str(hora) + ':' + str(minuto)
 
-                    viajes_actuales[dni] = [numero_bicicleta, estacion, horario_salida]
-                    estaciones[estacion][4] += 1
-                    
-                    return (estaciones, bicicletas, usuarios, viajes_actuales)
-            else:
-                print ("No hay bicicleta disponible, intente en otra estación")
-            numero_anclaje += 1
-    return (estaciones, bicicletas, usuarios, viajes_actuales)
+                        viajes_actuales[dni] = [numero_bicicleta, estacion, horario_salida]
+                        estaciones[estacion][4] += 1
+                        
+                        return (estaciones, bicicletas, usuarios, viajes_actuales)
+                else:
+                    print ("No hay bicicleta disponible, intente en otra estación")
+                numero_anclaje += 1
+    return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
 
 def viaje_aleatorio():
     return 0
@@ -582,7 +584,7 @@ def menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales,
             if opcion == '1':
                 usuarios = ingresar_usuario(usuarios)
             elif opcion == '2':
-                estaciones, bicicletas, usuarios, viajes_actuales = retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales)    
+                estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados = retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
             elif opcion == '3':
                 dni = validar_dni("Ingrese su numero de dni: ")
                 while not dni in usuarios:
