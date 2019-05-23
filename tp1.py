@@ -265,7 +265,7 @@ def cargar_bicicletas(estaciones, bicicletas):
             bicicletas_en_reparacion.append(numero_bicicleta)
         else:
             ubicacion = "anclada"
-            if len(estaciones[numero_estaciones][3]) < 30:
+            if len(estaciones[numero_estaciones][3]) < 24: #Iguales cantidades de bicicletas en las 10 estaciones
                 estaciones[numero_estaciones][3].append(numero_bicicleta)
             else:
                 numero_estaciones += 1
