@@ -36,8 +36,9 @@ def alta_usuario(usuarios):
     pin = validar_pin ("Ingrese su pin: ")
     nombre = validar_nombre ("Ingrese su nombre y apellido: ")
     celular = validar_celular ("Ingrese su numero de celular: ")
-    
-    usuarios[dni] = [nombre,celular,pin]
+    duracion_viaje = 0
+    cantidad_viajes =0
+    usuarios[dni] = [nombre,celular,pin,duracion_viaje, cantidad_viajes]
 
 def validar_dni (mensaje):
     dni = input (mensaje)
@@ -128,11 +129,12 @@ def desbloquear_usuario(usuarios, usuarios_bloqueados):
             usuarios_bloqueados.remove(usuario_a_desbloquear)
             usuarios[usuario_a_desbloquear][2] = randint(1000,9999)
             print('Su nuevo pin es: ',usuarios[usuario_a_desbloquear][2])
+            return usuarios, usuarios_bloqueados
         else: 
             palabra_secreta = input ("La clave ha sido incorrecta. Ingresela nuevamente: ")
     else:
         print ("Su usuario no esta bloqueado.")
-
+    
 #Sólo cuenta las veces que entra a validar: en 3 -> BLOQUEAR
 def validar_bloqueo(usuarios):
     dni = validar_dni("Ingrese su DNI: ")
@@ -477,7 +479,7 @@ def menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales,
             elif opcion == '3':
                 ingresar_usuario(usuarios)
             elif opcion == '4':
-                desbloquear_usuario(usuarios, usuarios_bloqueados)
+                usuarios,usuarios_bloqueados =desbloquear_usuario(usuarios, usuarios_bloqueados)
             elif opcion == '0':
                 os.system('clear') ##Limpia la terminal
 
