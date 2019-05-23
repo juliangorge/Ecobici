@@ -1,3 +1,14 @@
+GRUPO POLILLA:
+
+-Ariel Pisterman 103936
+-Julian Porge 104286
+-Julieta Ponti 104694
+-Franco Cuppari 104098
+
+Aclaraciones:
+- un usuario valido: dni = 10000000 , pin = 1010
+- en la funcion modificar pin, la validacion de 3 intentos esta hecha ingresando pins validos, los pins invalidos no cuentan.
+
 #
 ##########################################################################################
 #
@@ -28,3 +39,5 @@
 #
 ##########################################################################################
 #
+
+

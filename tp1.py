@@ -438,7 +438,7 @@ def cargar_bicicletas_random(estaciones, bicicletas):
 
 def cargar_usuario(usuarios):
     #carga los usuarios al sistema
-    pre_nombres = ['Pablo Guarna','Julieta Ponti','Julián Gorge','Ariel Pisterman','Francopre Cuppari']
+    pre_nombres = ['Uriel Kelman','Julieta Ponti','Julián Gorge','Ariel Pisterman','Franco Cuppari']
     pre_celular = ['03034568','03034569','12345678','87654321','13578642']
     tiempo_de_viaje = 0
     dni = 9999999
