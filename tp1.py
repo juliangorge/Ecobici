@@ -18,6 +18,7 @@ def carga_datos_automatica(estaciones, bicicletas, usuarios):
     return (estaciones,bicicletas,usuarios)
 
 def carga_datos_random(estaciones, bicicletas, usuarios):
+    #Crea 10 estaciones, 5 usuarios, 250 bicis
     #Distribuye y crea 250 bicis aleatoriamente en estaciones
     
     #Libero diccionarios
@@ -145,7 +146,7 @@ def desbloquear_usuario(usuarios, usuarios_bloqueados):
             palabra_secreta = input ("La clave ha sido incorrecta. Ingresela nuevamente: ")
         print ("Su usuario ha sido desbloqueado.")
         usuarios_bloqueados.remove(usuario_a_desbloquear)
-        usuarios[usuario_a_desbloquear][2] = randint(1000,9999)
+        usuarios[usuario_a_desbloquear][2] = randint(1000,9999) #asigno nuevo pin
         print('Su nuevo pin es: ',usuarios[usuario_a_desbloquear][2])
         return usuarios, usuarios_bloqueados    
     else:
@@ -195,7 +196,7 @@ def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuario
                     if(bicicletas[numero_bicicleta][0] == "ok"):
                         bicicletas[numero_bicicleta][1] = "En circulación"
                         estaciones[estacion][3].remove(numero_bicicleta)
-                        print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje))
+                        print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje+1))
                         numero_anclaje = 31 #Salgo de while
 
                         hora = randint(0,22)
@@ -217,7 +218,7 @@ def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuario
 
 def devolver_bicicleta(dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
     #Devuelve una bicicleta al diccionario estaciones y la quita de circulacion (viajes actuales), verificando el tiempo. En caso de excederse el usuario debe bloquearse
-    while len(estaciones[estacion][3]) < estaciones[estacion][2]:
+    while len(estaciones[estacion][3]) < estaciones[estacion][2]: #se fija que haya lugar en la estacion
         duracion_viaje = randint(5,75)
         if duracion_viaje > 60:
             bloquear_usuario(dni,usuarios,usuarios_bloqueados)
@@ -237,12 +238,12 @@ def devolver_bicicleta(dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloq
             hora += 1
         else:
             minuto += duracion_viaje
-
+        #agrega el 0 a los minutos si son menores a 10
         if minuto <10:
             horario_llegada = str(hora) + ': 0' + str(minuto)
         else:
             horario_llegada = str(hora) + ':' + str(minuto)
-        del viajes_actuales[dni]
+        del viajes_actuales[dni] #borra el viaje actual
         
         usuarios[dni][3] += duracion_viaje
         usuarios[dni][4] += 1
@@ -273,8 +274,10 @@ def seleccionar_usuario(usuarios, viajes_actuales,usuarios_bloqueados):
         while usuario_a_viajar == -1:
             indice_usuario = randint(0,(len(lista_usuarios)-1))
             if lista_usuarios[indice_usuario][0] not in usuarios_bloqueados and lista_usuarios[indice_usuario][0] not in viajes_actuales:
+                #asigna el usuario
                 usuario_a_viajar = usuario_a_viajar =  lista_usuarios[indice_usuario][0]
             else:
+                #hago una lista con los usuarios bloqueados para compararla con usuarios y ver cuando no hay mas usuarios disponibles
                 if indice_usuario not in listado_pins:
                     listado_pins.append(indice_usuario)
                 if len(listado_pins) == len (lista_usuarios):
@@ -286,7 +289,7 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
     #Simula retiro y devolución de una bicicleta
     for numero_ejecucion in range(0,int(cantidad_ejecuciones)):
         dni = seleccionar_usuario(usuarios,viajes_actuales,usuarios_bloqueados)
-        if dni != -1:
+        if dni != -1: #si es -1, no hay usuarios disponibles 
             estacion =randint(1,10)
             #saco bici
             
@@ -308,7 +311,7 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
                                 minuto = randint(0,30) 
                             else:
                                 minuto = randint(0,59)
-                            if minuto <10:
+                            if minuto <10: #agrega el 0 a los minutos si son menores a 10
                                 horario_salida = str(hora) + ': 0' + str(minuto)
                             else:
                                 horario_salida = str(hora) + ':' + str(minuto)
@@ -322,12 +325,12 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
                     numero_anclaje += 1
 
                 estacion_devolucion = estacion
-                while estacion_devolucion == estacion  and len(estaciones[estacion_devolucion][3]) >= estaciones[estacion_devolucion][2]:
+                while estacion_devolucion == estacion  or len(estaciones[estacion_devolucion][3]) >= estaciones[estacion_devolucion][2]:
                     estacion_devolucion = randint(1,10)
                 #devuelvo bici
                 #devolver_bicicleta(dni,estacion_devolucion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
                 seguir = True
-                while len(estaciones[estacion_devolucion][3]) < estaciones[estacion_devolucion][2] and seguir  ==True:
+                while len(estaciones[estacion_devolucion][3]) < estaciones[estacion_devolucion][2] and seguir  ==True and estacion_devolucion != estacion:
                     duracion_viaje = randint(5,75)
                     if duracion_viaje > 60:
                         bloquear_usuario(dni,usuarios,usuarios_bloqueados)
@@ -343,7 +346,7 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
                         hora += 1
                     else:
                         minuto += duracion_viaje
-
+                    #agrega el 0 a los minutos si son menores a 10
                     if minuto <10:
                         horario_llegada = str(hora) + ': 0' + str(minuto)
                     else:
@@ -415,7 +418,7 @@ def cargar_bicicletas(estaciones, bicicletas):
             else:
                 numero_estaciones += 1
                 estaciones[numero_estaciones][3].append(numero_bicicleta)
-                print(estaciones[numero_estaciones])
+                #print(estaciones[numero_estaciones])
 
             bicicletas[numero_bicicleta] = [estado, ubicacion]
 

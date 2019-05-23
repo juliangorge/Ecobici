@@ -6,7 +6,8 @@ GRUPO POLILLA:
 -Franco Cuppari 104098
 
 Aclaraciones:
-- un usuario valido: dni = 10000000 , pin = 1010
+- cargar datos para poder usar las estaciones, bicicletas y usuarios, ya sea a mano o aleatoriamente
+- un usuario existente luego de cargar los datos: dni = 10000000 , pin = 1010
 - en la funcion modificar pin, la validacion de 3 intentos esta hecha ingresando pins validos, los pins invalidos no cuentan.
 
 #
