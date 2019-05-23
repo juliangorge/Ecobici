@@ -44,7 +44,7 @@ def alta_usuario(usuarios):
         duracion_viaje = 0
         cantidad_viajes =0
         usuarios[dni] = [nombre,celular,pin,duracion_viaje, cantidad_viajes]
-        print(usuarios)
+        print("Su usuario ha sido creado.")
         return(usuarios)
     print("Usted ya tiene un usuario")
     return(usuarios)    
@@ -132,6 +132,7 @@ def modificar_pin(dni,usuarios):
         pin_nuevo = validar_pin("Ingrese su pin: ")
         pin_nuevo2 = validar_pin("Reingrese su pin: ")
     usuarios[dni][2] = pin_nuevo
+    print("Su nuevo pin es: ",pin_nuevo)
     return (usuarios)
 
 def desbloquear_usuario(usuarios, usuarios_bloqueados):
