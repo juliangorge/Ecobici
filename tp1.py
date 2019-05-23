@@ -292,22 +292,25 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
                         horario_salida = str(hora) + ':' + str(minuto)
                         estaciones[estacion][4] +=1
                         print("{} retiro la bicicleta {} de la estación {} ubicada en {}, a las {}\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_salida))
-                        viajes_actuales[dni] = [numero_bicicleta, estacion, horario_salida]    
+                        viajes_actuales[int(dni)] = [numero_bicicleta, estacion, horario_salida]    
                 else:
                     print ("No hay bicicleta disponible, intente en otra estación")
                 numero_anclaje += 1
+
         estacion_devolucion = estacion
         while estacion_devolucion == estacion :
             estacion_devolucion = randint(1,10)
         #devuelvo bici
         #devolver_bicicleta(dni,estacion_devolucion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
-        while len(estaciones[estacion][3]) < estaciones[estacion][2]:
+        seguir = True
+        while len(estaciones[estacion_devolucion][3]) < estaciones[estacion_devolucion][2] and seguir  ==True:
             duracion_viaje = randint(5,75)
             if duracion_viaje > 60:
                 bloquear_usuario(dni,usuarios,usuarios_bloqueados)
             
+            numero_bicicleta = viajes_actuales[dni][0]
             bicicletas[numero_bicicleta][1] = "anclada"
-    
+
             horario = viajes_actuales[dni][2].split(':')
             hora = int(horario[0])
             minuto = int(horario[1])
@@ -317,22 +320,25 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
             else:
                 minuto += duracion_viaje
 
-            if minuto < 10:
+            if minuto <10:
                 horario_llegada = str(hora) + ': 0' + str(minuto)
             else:
                 horario_llegada = str(hora) + ':' + str(minuto)
             del viajes_actuales[dni]
-
+            
             usuarios[dni][3] += duracion_viaje
             usuarios[dni][4] += 1
-            estaciones[estacion][3].append(numero_bicicleta)
+            estaciones[estacion_devolucion][3].append(numero_bicicleta)
             viajes_finalizados[dni] = [numero_bicicleta, horario_llegada, estacion]
-            estaciones[estacion][4] += 1 
+            estaciones[estacion_devolucion][4] += 1 
             if duracion_viaje > 60:
-                    print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}. Al exceder los 60 minutos de uso ha sido bloqueado.\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_llegada))
+                    print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}. Al exceder los 60 minutos de uso ha sido bloqueado.\n".format(usuarios[dni][0],numero_bicicleta, estacion_devolucion,estaciones[estacion][0],horario_llegada))
             else:
-                print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}.\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_llegada))
-        print("No hay anclajes disponibles")
+                print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}.\n".format(usuarios[dni][0],numero_bicicleta, estacion_devolucion,estaciones[estacion][0],horario_llegada))
+            seguir =False        
+        if len(estaciones[estacion_devolucion][3]) >= estaciones[estacion_devolucion][2]:
+            print("No hay anclajes disponibles")
+        seguir = False
     return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
     
 def simulacion_con_parametro(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
