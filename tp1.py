@@ -64,7 +64,7 @@ def bloquear_usuario(dni,usuarios,usuarios_bloqueados):
     usuarios_bloqueados.append(dni)
     usuarios[dni][2] = None
     print('Usuario bloqueado!')
-    return usuarios,usuarios_bloqueados
+    return (usuarios,usuarios_bloqueados)
 
 def validar_nombre (mensaje):
     nombre = input (mensaje)
@@ -124,12 +124,12 @@ def modificar_pin(dni,usuarios):
     return (usuarios)
 
 def desbloquear_usuario(usuarios, usuarios_bloqueados):
-    
-    for usuario in usuarios_bloqueados:
-        print (usuario)
+    claves_usuarios = usuarios_bloqueados.keys()
+    for i in usuarios_bloqueados:
+        print ((i+1), usuarios_bloqueados[i])
     usuario_a_desbloquear = validar_dni('Ingrese el dni del usuario a desbloquear: ')
 
-    if usuario_a_desbloquear in usuarios_bloqueados:
+    if usuario_a_desbloquear in claves_usuarios:
         palabra_secreta = input ("Ingrese la palabra secreta: ")
         if palabra_secreta == 'shimano': 
             print ("Su usuario ha sido desbloqueado.")
@@ -141,15 +141,15 @@ def desbloquear_usuario(usuarios, usuarios_bloqueados):
             palabra_secreta = input ("La clave ha sido incorrecta. Ingresela nuevamente: ")
     else:
         print ("Su usuario no esta bloqueado.")
-        return usuarios, usuarios_bloqueados
+        return(usuarios, usuarios_bloqueados)
     
 #Sólo cuenta las veces que entra a validar: en 3 -> BLOQUEAR
-def validar_bloqueo(usuarios,usuarios_bloqueados):
+def validar_bloqueo(usuarios):
     dni = validar_dni("Ingrese su DNI: ")
     claves_usuarios = usuarios.keys()
     while not dni in claves_usuarios:
         print("El usuario no existe, ingrese un usuario valido ")
-        return validar_bloqueo(usuarios,usuarios_bloqueados)
+        return validar_bloqueo(usuarios)
     intentos = 0
     pin = validar_pin("Ingrese su pin: ")
     while usuarios[dni][2] != pin:
@@ -157,13 +157,13 @@ def validar_bloqueo(usuarios,usuarios_bloqueados):
             intentos += 1
             pin = validar_pin("Su pin es incorrecto. Ingreselo nuevamente: ")
         else:   
-            usuarios,usuarios_bloqueados = bloquear_usuario(dni,usuarios,usuarios_bloqueados)
-            return usuarios,dni,usuarios_bloqueados
-    return usuarios,dni,usuarios_bloqueados
+            usuarios = bloquear_usuario(dni,usuarios,usuarios_bloqueados)
+            return (usuarios)
+    return(usuarios,dni)
 ##verificar si existe estacion
 
-def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales,usuarios_bloqueados):
-    usuarios,dni = validar_bloqueo(usuarios,usuarios_bloqueados)
+def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales):
+    usuarios,dni = validar_bloqueo(usuarios)
     if(len(viajes_actuales) and len(viajes_actuales[dni]) > 0):
         print('Usted ya tiene una bicicleta!')
     else:
@@ -209,7 +209,7 @@ def devolver_bicicleta(dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloq
     while len(estaciones[estacion][3]) < estaciones[estacion][2]:
         duracion_viaje = randint(5,75)
         if duracion_viaje > 60:
-            usuarios, usuarios_bloqueados = bloquear_usuario(dni,usuarios,usuarios_bloqueados)
+            bloquear_usuario(dni,usuarios,usuarios_bloqueados)
         necesita_reparacion = input("¿La bicicleta necesita reparacion? si/no: ")
         while necesita_reparacion != "si" and necesita_reparacion!= "no":
             necesita_reparacion = input("¿La bicicleta necesita reparacion? si/no: ")
@@ -302,7 +302,7 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
         while len(estaciones[estacion][3]) < estaciones[estacion][2]:
             duracion_viaje = randint(5,75)
             if duracion_viaje > 60:
-                usuarios, usuarios_bloqueados = bloquear_usuario(dni,usuarios,usuarios_bloqueados)
+                bloquear_usuario(dni,usuarios,usuarios_bloqueados)
             
             bicicletas[numero_bicicleta][1] = "anclada"
 
@@ -496,12 +496,12 @@ def menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales,
                 print('La opción es incorrecta.\n')
                 opcion = input('Elige una opción para continuar: ')
             if opcion == '1':
-                estaciones,bicicletas,usuarios,usuarios_bloqueados = carga_datos_automatica(estaciones, bicicletas, usuarios)
+                estaciones,bicicletas,usuarios = carga_datos_automatica(estaciones, bicicletas, usuarios)
                 os.system('clear') ##Limpia la terminal
                 
                 print('Datos cargados!\n')
             elif opcion == '2':
-                estaciones,bicicletas,usuarios, usuarios_bloqueados = carga_datos_random(estaciones, bicicletas, usuarios)
+                estaciones,bicicletas,usuarios = carga_datos_random(estaciones, bicicletas, usuarios)
                 os.system('clear') ##Limpia la terminal
                 
                 print('Datos aleatorios cargados!\n')
@@ -582,7 +582,7 @@ def menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales,
             if opcion == '1':
                 usuarios = ingresar_usuario(usuarios)
             elif opcion == '2':
-                estaciones, bicicletas, usuarios, viajes_actuales = retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales,usuarios_bloqueados)    
+                estaciones, bicicletas, usuarios, viajes_actuales = retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales)    
             elif opcion == '3':
                 dni = validar_dni("Ingrese su numero de dni: ")
                 while not dni in usuarios:
