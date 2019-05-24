@@ -9,41 +9,35 @@ def carga_datos_automatica(estaciones, bicicletas, usuarios):
     estaciones = {}
     bicicletas = {}
     usuarios = {}
-    
     #Cargo valores a los diccionarios
     cargar_estaciones(estaciones)
     cargar_usuario(usuarios)
     cargar_bicicletas(estaciones, bicicletas)
-
+    print("Datos cargados!")
     return (estaciones,bicicletas,usuarios)
 
 def carga_datos_random(estaciones, bicicletas, usuarios):
     #Crea 10 estaciones, 5 usuarios, 250 bicis
     #Distribuye y crea 250 bicis aleatoriamente en estaciones
-    
     #Libero diccionarios
     estaciones = {}
     bicicletas = {}
     usuarios = {}
-    
     #Carga valores a los diccionarios
     cargar_estaciones(estaciones)
     cargar_usuario(usuarios)
     cargar_bicicletas_random(estaciones, bicicletas)
-
+    print("Datos cargados aleatoriamente!")
     return (estaciones,bicicletas,usuarios)
 
 def alta_usuario(usuarios):
     #Recibe el diccionario de usuarios y añado uno nuevo con validación
-
     dni = validar_dni ("Ingrese su DNI: ")
     while not dni in usuarios:
         pin = validar_pin ("Ingrese su pin: ")
         nombre = validar_nombre ("Ingrese su nombre y apellido: ")
         celular = validar_celular ("Ingrese su numero de celular: ")
-        duracion_viaje = 0
-        cantidad_viajes =0
-        usuarios[dni] = [nombre,celular,pin,duracion_viaje, cantidad_viajes]
+        usuarios[dni] = [nombre,celular,pin, 0, 0] #inicializo en 0 la cantidad de viajes y los minutos de viaje del usuario nuevo
         print("Su usuario ha sido creado.")
         return(usuarios)
     print("Usted ya tiene un usuario")
@@ -59,7 +53,6 @@ def validar_dni (mensaje):
 def validar_pin (mensaje):
     #Recibe el pin y verifica si está bien ingresado
     pin = input (mensaje)
-
     while len (pin) == 4 and pin.isdigit() :
         return int(pin)
     return validar_pin("Ingrese un pin correcto: ")
@@ -140,7 +133,6 @@ def desbloquear_usuario(usuarios, usuarios_bloqueados):
     for usuario in usuarios_bloqueados:
         print (usuario, usuarios[usuario][0])
     usuario_a_desbloquear = validar_dni('Ingrese el dni del usuario a desbloquear: ')
-
     if usuario_a_desbloquear in usuarios_bloqueados:
         palabra_secreta = input ("Ingrese la palabra secreta: ")
         while not palabra_secreta == 'shimano':    
@@ -161,9 +153,8 @@ def validar_bloqueo(usuarios,usuarios_bloqueados):
         claves_usuarios = usuarios.keys()
         while not dni in claves_usuarios:
             print("El usuario no existe, ingrese un usuario valido ")
-            return validar_bloqueo(usuarios,usuarios_bloqueados)
-        #Considerando el primer INGRESO como intento nº1
-        intentos = 2
+            return validar_bloqueo(usuarios,usuarios_bloqueados)    
+        intentos = 2 #Considerando el primer INGRESO como intento nº1
         pin = validar_pin("Ingrese su pin: ")
         while usuarios[dni][2] != pin:
             if(intentos <= 3):
@@ -179,7 +170,6 @@ def validar_bloqueo(usuarios,usuarios_bloqueados):
 def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados):
     #Retira una bicicleta del diccionario estaciones y la pone en circulacion (viajes actuales), verificando que el usuario no esté bloqueado
     usuarios,dni = validar_bloqueo(usuarios,usuarios_bloqueados)
-    
     if(len(viajes_actuales) and len(viajes_actuales[dni]) > 0):
         print('Usted ya tiene una bicicleta!')
     else:
@@ -189,7 +179,6 @@ def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuario
             while not int(estacion) in claves or not estacion.isdigit():
                 estacion = input('Seleccione un número de estación correcto: ')
             estacion = int(estacion)
-            
             numero_anclaje = 0
             while len(estaciones[estacion][3]) >= numero_anclaje:
                 if(len(estaciones[estacion][3]) > 0):
@@ -199,18 +188,14 @@ def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuario
                         estaciones[estacion][3].remove(numero_bicicleta)
                         print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje+1))
                         numero_anclaje = 31 #Salgo de while
-
                         hora = randint(0,22)
                         if(hora == 22):
                             minuto = randint(0,30) 
                         else:
                             minuto = randint(0,59)
-
                         horario_salida = str(hora) + ':' + str(minuto)
-
                         viajes_actuales[dni] = [numero_bicicleta, estacion, horario_salida]
                         estaciones[estacion][4] += 1
-                        
                         return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
                 else:
                     print ("No hay bicicleta disponible, intente en otra estación")
@@ -230,7 +215,6 @@ def devolver_bicicleta(dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloq
         if necesita_reparacion == "si":
             bicicletas[numero_bicicleta][0] = "reparacion"
         bicicletas[numero_bicicleta][1] = "anclada"
-
         horario = viajes_actuales[dni][2].split(':')
         hora = int(horario[0])
         minuto = int(horario[1])
@@ -245,7 +229,6 @@ def devolver_bicicleta(dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloq
         else:
             horario_llegada = str(hora) + ':' + str(minuto)
         del viajes_actuales[dni] #borra el viaje actual
-        
         usuarios[dni][3] += duracion_viaje
         usuarios[dni][4] += 1
         estaciones[estacion][3].append(numero_bicicleta)
@@ -293,7 +276,6 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
         if dni != -1: #si es -1, no hay usuarios disponibles 
             estacion =randint(1,10)
             #saco bici
-            
             if(len(viajes_actuales) and len(viajes_actuales[dni]) > 0):
                 print('Usted ya tiene una bicicleta!')
             else:
@@ -304,9 +286,7 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
                         if(bicicletas[numero_bicicleta][0] == "ok"):
                             bicicletas[numero_bicicleta][1] = "En circulación"
                             estaciones[estacion][3].remove(numero_bicicleta)
-
                             numero_anclaje = 31 #Salgo de while
-
                             hora = randint(0,22)
                             if(hora == 22):
                                 minuto = randint(0,30) 
@@ -324,7 +304,6 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
                     else:
                         print ("No hay bicicleta disponible, intente en otra estación")
                     numero_anclaje += 1
-
                 estacion_devolucion = estacion
                 while estacion_devolucion == estacion  or len(estaciones[estacion_devolucion][3]) >= estaciones[estacion_devolucion][2]:
                     estacion_devolucion = randint(1,10)
@@ -335,10 +314,8 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
                     duracion_viaje = randint(5,75)
                     if duracion_viaje > 60:
                         bloquear_usuario(dni,usuarios,usuarios_bloqueados)
-                    
                     numero_bicicleta = viajes_actuales[dni][0]
                     bicicletas[numero_bicicleta][1] = "anclada"
-
                     horario = viajes_actuales[dni][2].split(':')
                     hora = int(horario[0])
                     minuto = int(horario[1])
@@ -353,7 +330,6 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
                     else:
                         horario_llegada = str(hora) + ':' + str(minuto)
                     del viajes_actuales[dni]
-                    
                     usuarios[dni][3] += duracion_viaje
                     usuarios[dni][4] += 1
                     estaciones[estacion_devolucion][3].append(numero_bicicleta)
@@ -376,7 +352,6 @@ def simulacion_con_parametro(estaciones,bicicletas,usuarios,usuarios_bloqueados,
     cantidad_ejecuciones_simulacion = input("Ingrese la cantidad de simulaciones: ")
     while not cantidad_ejecuciones_simulacion.isdigit():
         cantidad_ejecuciones_simulacion = input("Ingrese una cantidad de simulaciones valida: ")
-
     estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = simulacion(cantidad_ejecuciones_simulacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
     return (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
 
@@ -408,7 +383,6 @@ def cargar_bicicletas(estaciones, bicicletas):
             estado = "ok"
         else:
             estado = "reparacion"
-
         if estado == "reparacion":
             ubicacion = "reparacion"
             bicicletas_en_reparacion.append(numero_bicicleta)
@@ -420,7 +394,6 @@ def cargar_bicicletas(estaciones, bicicletas):
                 numero_estaciones += 1
                 estaciones[numero_estaciones][3].append(numero_bicicleta)
                 #print(estaciones[numero_estaciones])
-
             bicicletas[numero_bicicleta] = [estado, ubicacion]
 
 def cargar_bicicletas_random(estaciones, bicicletas):
@@ -451,10 +424,8 @@ def cargar_usuario(usuarios):
     for i in range(1,6):
         nombre = pre_nombres[i-1]
         celular = pre_celular[i-1]
-
         dni += 1
         pin += 10
-
         usuarios[dni] = [nombre,celular,pin,tiempo_de_viaje,cantidad_viajes]
 
 def mostrar_bicicletas(bicicletas):
@@ -511,7 +482,7 @@ def top_estaciones (estaciones):
     for i in range (0,10):
         print ((i+1) , "- Estacion: #" , top_estaciones_activas[i][0], 'con', top_estaciones_activas[i][1], 'usos')
 
-def carga_de_datos_menu (estaciones,bicicletas,usuarios):
+def carga_de_datos_menu(estaciones,bicicletas,usuarios):
     print('1 - Carga automática')
     print('2 - Carga automática aleatoria\n')
     print('0 - Salir \n')
@@ -520,17 +491,17 @@ def carga_de_datos_menu (estaciones,bicicletas,usuarios):
     while opcion not in ['1','2','0']:
         print('La opción es incorrecta.\n')
         opcion = input('Elige una opción para continuar: ')
-        if opcion == '1':
-            estaciones,bicicletas,usuarios = carga_datos_automatica(estaciones, bicicletas, usuarios)
-            os.system('clear') ##Limpia la terminal 
-            print('Datos cargados!\n')
-        elif opcion == '2':
-            estaciones,bicicletas,usuarios = carga_datos_random(estaciones, bicicletas, usuarios)   
-            os.system('clear') ##Limpia la terminal
-            print('Datos aleatorios cargados!\n')
-        elif opcion == '0':
-            os.system('clear') ##Limpia la terminal
-    return (estaciones,bicicletas,usuarios)
+    if opcion == '1':
+        estaciones,bicicletas,usuarios = carga_datos_automatica(estaciones, bicicletas, usuarios)
+        os.system('clear') ##Limpia la terminal 
+        print('Datos cargados!\n')
+    elif opcion == '2':
+        estaciones,bicicletas,usuarios = carga_datos_random(estaciones, bicicletas, usuarios)   
+        os.system('clear') ##Limpia la terminal
+        print('Datos aleatorios cargados!\n')
+    elif opcion == '0':
+        os.system('clear') ##Limpia la terminal
+    return (estaciones,bicicletas,usuarios)    
 
 def usuarios_menu (usuarios,usuarios_bloqueados):
     print('1 - Listado')
@@ -597,7 +568,6 @@ def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas
     print('2 - Retirar Bicicleta')
     print('3 - Devolver bicicletas')
     print('0 - Salir \n')
-
     opcion = input('Elige una opción para continuar: ')
     while opcion not in ['1','2','3','0']:
         print('La opción es incorrecta.\n')
@@ -621,11 +591,9 @@ def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas
             print('No tienes ninguna bicicleta para devolver!')
     elif opcion == '0':
         os.system('clear') ##Limpia la terminal
-
 ##############################
 #####     MAIN CODE      #####
 ##############################
-
 def menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales, viajes_finalizados, bicicletas_en_reparacion):
     seguir = True
     while seguir == True:
@@ -636,28 +604,23 @@ def menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales,
         print('4 - Informes')
         print('5 - Ingresar al sistema')
         print('0 - Salir \n')
-
         #Si se ingresa un valor distinto, vuelve al menú raíz
         opcion = input('Elige una opción para continuar: ')
-
         if opcion == 0:
             seguir = False
-
         elif opcion == '1':
             carga_de_datos_menu(estaciones,bicicletas,usuarios)
         elif opcion == '2':
             usuarios_menu(usuarios,usuarios_bloqueados)
-
         elif opcion == '3':
             retiros_automaticos_menu (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
         elif opcion == '4':
             informes_menu(estaciones,usuarios,bicicletas_en_reparacion)
-
         elif opcion == '5':
-            ##Ingreso al sistema
+            #Ingreso al sistema
             ingreso_al_sistema_menu(estaciones, usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados)
         else:
-            os.system('clear') ##Limpia la terminal
+            os.system('clear') #Limpia la terminal
             print('Vuelva a intentarlo')
 
 #Inicializo diccionarios
@@ -668,7 +631,6 @@ usuarios_bloqueados = []
 viajes_actuales = {}
 viajes_finalizados = {}
 bicicletas_en_reparacion = []
-
 ### Arranco programa
 os.system('clear') ##Limpia la terminal
 menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales, viajes_finalizados, bicicletas_en_reparacion)
