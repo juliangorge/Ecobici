@@ -328,7 +328,7 @@ def validar_bloqueo(usuarios,usuarios_bloqueados):
 def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados):
     #Retira una bicicleta del diccionario estaciones y la pone en circulacion (viajes actuales), verificando que el usuario no esté bloqueado
     usuarios,dni = validar_bloqueo(usuarios,usuarios_bloqueados)
-    if not dni:
+    if dni in viajes_actuales:
         print('Usted ya tiene una bicicleta!')
     else:
         if(dni not in usuarios_bloqueados):
