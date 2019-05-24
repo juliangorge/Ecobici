@@ -160,7 +160,8 @@ def validar_celular (mensaje):
         return celular
     else:
         return validar_celular("Ingrese un numero de celular valido:")
-        
+ 
+"""      
 def ingresar_usuario_modificacion(usuarios):
     #Recibe el diccionario usuario y verifica si los datos ingresados corresponden a un usuario existente,
     # y le permite modificar su pin.
@@ -180,19 +181,6 @@ def ingresar_usuario_modificacion(usuarios):
         usuarios = modificar_pin(dni,usuarios)
         return(usuarios) 
      
-def modificar_pin(dni,usuarios):
-    #Recibe el dni y modifica su pin
-    print("Cambiando su PIN")
-    pin_nuevo =validar_pin("Ingrese su nuevo pin: ")
-    pin_nuevo2 = validar_pin("Reingrese su nuevo pin: ")
-    while pin_nuevo != pin_nuevo2:
-        print("Los pins no son iguales, ingreselos nuevamente")
-        pin_nuevo = validar_pin("Ingrese su pin: ")
-        pin_nuevo2 = validar_pin("Reingrese su pin: ")
-    usuarios[dni][2] = pin_nuevo
-    print("Su nuevo pin es: ",pin_nuevo)
-    return (usuarios)
-    
 def validar_usuario(dni,pin,usuarios):
     #Recibe el diccionario usuarios 
     #Verifica si los datos ingresados corresponden a un usuario existente.
@@ -204,7 +192,24 @@ def validar_usuario(dni,pin,usuarios):
             return "existe"
         else:
             return "pin incorrecto"
-
+"""    
+def modificar_pin(usuarios,usuarios_bloqueados):
+    #Recibe el dni y modifica su pin
+    usuarios, dni = validar_bloqueo(usuarios,usuarios_bloqueados)
+    while not dni in usuarios_bloqueados:
+        print("Cambiando su PIN")
+        pin_nuevo =validar_pin("Ingrese su nuevo pin: ")
+        pin_nuevo2 = validar_pin("Reingrese su nuevo pin: ")
+        while pin_nuevo != pin_nuevo2:
+            print("Los pins no son iguales, ingreselos nuevamente")
+            pin_nuevo = validar_pin("Ingrese su pin: ")
+            pin_nuevo2 = validar_pin("Reingrese su pin: ")
+        usuarios[dni][2] = pin_nuevo
+        print("Su nuevo pin es: ",pin_nuevo)
+        return (usuarios,usuarios_bloqueados)
+    print("Su usuario esta bloqueado, no puede modificar su pin.")
+    return (usuarios,usuarios_bloqueados)
+    
 def bloquear_usuario(dni,usuarios,usuarios_bloqueados):
     #Recibe la lista de usuarios bloqueados añade el usuario a bloquear
     usuarios_bloqueados.append(dni)
@@ -297,6 +302,10 @@ def top_estaciones (estaciones):
 def validar_bloqueo(usuarios,usuarios_bloqueados):
     #ingresa sus datos el usuario, si es necesario lo bloquea (si falla 3 veces el ingreso del pin)  
     dni = validar_dni("Ingrese su DNI: ")
+    print(usuarios)
+    while not dni in usuarios:
+        print("El dni es incorrecto o usted no tiene un usuario")
+        return validar_bloqueo(usuarios,usuarios_bloqueados)
     while not dni in usuarios_bloqueados:
         claves_usuarios = usuarios.keys()
         while not dni in claves_usuarios:
@@ -314,7 +323,55 @@ def validar_bloqueo(usuarios,usuarios_bloqueados):
         return(usuarios,dni)
     print("Su usuario esta bloqueado. No puede retirar una bicicleta")
     return(usuarios,dni)
+
 #aca va retirar y devolver bicicleta
+def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados):
+    #Retira una bicicleta del diccionario estaciones y la pone en circulacion (viajes actuales), verificando que el usuario no esté bloqueado
+    usuarios,dni = validar_bloqueo(usuarios,usuarios_bloqueados)
+    if not dni:
+        print('Usted ya tiene una bicicleta!')
+    else:
+        if(dni not in usuarios_bloqueados):
+            numero_bicicleta,estacion,numero_anclaje = elegir_bicicleta_de_estacion(estaciones,bicicletas)
+            while numero_bicicleta != -1:
+                bicicletas[numero_bicicleta][1] = "En circulación"
+                estaciones[estacion][3].remove(numero_bicicleta)
+                print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje+1))
+                horario_salida = generar_horario_salida()
+                viajes_actuales[dni] = [numero_bicicleta, estacion, horario_salida]
+                estaciones[estacion][4] += 1
+                return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
+            print ("No hay bicicletas disponibles, intente en otra estación")
+    return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
+
+def elegir_bicicleta_de_estacion(estaciones,bicicletas):
+    estacion = input('Seleccione número de estación: ')
+    claves = estaciones.keys()
+    while not int(estacion) in claves or not estacion.isdigit():
+        estacion = input('Seleccione un número de estación correcto: ')
+    estacion = int(estacion)
+    numero_anclaje = 0
+    while len(estaciones[estacion][3]) >= numero_anclaje:
+        if(len(estaciones[estacion][3]) > 0):
+            numero_bicicleta = estaciones[estacion][3][numero_anclaje]
+            if(bicicletas[numero_bicicleta][0] == "ok"):
+                return numero_bicicleta,estacion,numero_anclaje
+        else:
+            print ("No hay bicicletas, intente en otra estación")
+        numero_anclaje += 1
+    numero_bicicleta = -1
+    return numero_bicicleta, estacion,numero_anclaje
+def generar_horario_salida():
+    hora = randint(0,22)
+    if(hora == 22):
+        minuto = randint(0,30) 
+    else:
+        minuto = randint(0,59)
+    if minuto <10: #agrega el 0 a los minutos si son menores a 10
+        horario_salida = str(hora) + ': 0' + str(minuto)
+    else:
+        horario_salida = str(hora) + ':' + str(minuto)
+    return(horario_salida)
 def validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
     dni = validar_dni("Ingrese su numero de dni: ")
     while not dni in usuarios:
@@ -367,7 +424,7 @@ def usuarios_menu (usuarios,usuarios_bloqueados):
     elif opcion == '2':
         usuarios = alta_usuario(usuarios)
     elif opcion == '3':
-        usuarios = ingresar_usuario_modificacion(usuarios)
+        usuarios,usuarios_bloqueados = modificar_pin(usuarios,usuarios_bloqueados)
     elif opcion == '4':
         usuarios,usuarios_bloqueados =desbloquear_usuario(usuarios, usuarios_bloqueados)
     elif opcion == '0':
@@ -421,7 +478,7 @@ def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas
         print('La opción es incorrecta.\n')
         opcion = input('Elige una opción para continuar: ')
     if opcion == '1':
-        usuarios = ingresar_usuario_modificacion(usuarios)
+        usuarios,usuarios_bloqueados = modificar_pin(usuarios,usuarios_bloqueados)
     elif opcion == '2':
         estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados = retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
     elif opcion == '3':
@@ -429,6 +486,7 @@ def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas
         
     elif opcion == '0':
         os.system('clear') ##Limpia la terminal
+    return estaciones, usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados
 ##############################
 #####     MAIN CODE      #####
 ##############################
@@ -447,16 +505,16 @@ def menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales,
         if opcion == 0:
             seguir = False
         elif opcion == '1':
-            carga_de_datos_menu(estaciones,bicicletas,usuarios)
+            estaciones,bicicletas,usuarios =carga_de_datos_menu(estaciones,bicicletas,usuarios)
         elif opcion == '2':
-            usuarios_menu(usuarios,usuarios_bloqueados)
+           usuarios,usuarios_bloqueados =  usuarios_menu(usuarios,usuarios_bloqueados)
         elif opcion == '3':
-            retiros_automaticos_menu (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+            estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = retiros_automaticos_menu (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
         elif opcion == '4':
             informes_menu(estaciones,usuarios,bicicletas_en_reparacion)
         elif opcion == '5':
             #Ingreso al sistema
-            ingreso_al_sistema_menu(estaciones, usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados)
+            estaciones, usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados =ingreso_al_sistema_menu(estaciones, usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados)
         else:
             os.system('clear') #Limpia la terminal
             print('Vuelva a intentarlo')
