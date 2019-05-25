@@ -4,7 +4,7 @@ def carga_datos_automatica(estaciones, bicicletas, usuarios):
     #Crea 10 estaciones, 5 usuarios, 250 bicis
     #Carga las bicis en las estaciones "a mano"
     
-    #Libero diccionarios
+    #Se liberan diccionarios
     estaciones = {}
     bicicletas = {}
     usuarios = {}
@@ -18,7 +18,7 @@ def carga_datos_automatica(estaciones, bicicletas, usuarios):
 def carga_datos_random(estaciones, bicicletas, usuarios):
     #Crea 10 estaciones, 5 usuarios, 250 bicis
     #Distribuye y crea 250 bicis aleatoriamente en estaciones
-    #Libero diccionarios
+    #Se liberan diccionarios
     estaciones = {}
     bicicletas = {}
     usuarios = {}
@@ -262,6 +262,49 @@ def seleccionar_usuario(usuarios, viajes_actuales,usuarios_bloqueados):
         return (usuario_a_viajar)
 #ACA VAN LAS DOS SIMULACIONES
 
+def retirar_bicicleta(parametro, dni, estaciones, bicicletas, usuarios, viajes_actuales):
+    numero_bicicleta,estacion,numero_anclaje = elegir_bicicleta_de_estacion(parametro,estaciones,bicicletas)
+    while numero_bicicleta != -1:
+        bicicletas[numero_bicicleta][1] = "En circulación"
+        estaciones[estacion][3].remove(numero_bicicleta)
+        horario_salida = generar_horario_salida()
+        viajes_actuales[dni] = [numero_bicicleta, estacion, horario_salida]
+        estaciones[estacion][4] += 1
+        if parametro == "manual":
+            print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje+1))
+        else:
+           
+           print("{} retiro la bicicleta {} de la estación {} ubicada en {}, a las {}\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_salida))
+            
+        return (estacion,estaciones, bicicletas, usuarios, viajes_actuales)
+    print ("No hay bicicletas disponibles, intente en otra estación")
+
+
+def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
+    #Simula retiro y devolución de una bicicleta
+    for numero_ejecucion in range(0,int(cantidad_ejecuciones)):
+        dni = seleccionar_usuario(usuarios,viajes_actuales,usuarios_bloqueados)
+        if dni != -1: #si es -1, no hay usuarios disponibles 
+            print (numero_ejecucion+1)
+            estacion,estaciones, bicicletas, usuarios, viajes_actuales = retirar_bicicleta("simulacion", dni, estaciones, bicicletas, usuarios, viajes_actuales)
+            #busco al azar la estacion a devolver la bicicleta 
+            estacion_devolucion = estacion
+            while estacion_devolucion == estacion  or len(estaciones[estacion_devolucion][3]) >= estaciones[estacion_devolucion][2]:
+                estacion_devolucion = randint(1,10)
+             #devuelvo bici
+            devolver_bicicleta("simulacion",dni,estacion_devolucion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)              
+    return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+    
+def simulacion_con_parametro(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
+    #Se ingresa la cantidad de veces que se quiere ejecutar simulacion()
+    cantidad_ejecuciones_simulacion = input("Ingrese la cantidad de simulaciones: ")
+    while not cantidad_ejecuciones_simulacion.isdigit():
+        cantidad_ejecuciones_simulacion = input("Ingrese una cantidad de simulaciones valida: ")
+
+    estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = simulacion(cantidad_ejecuciones_simulacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+    return (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+
+
 def informe_cantidad_viajes(usuarios):
     #muestra los 10 usuarios que mas viajes hicieron
     lista_usuarios = []
@@ -302,7 +345,7 @@ def top_estaciones (estaciones):
 def validar_bloqueo(usuarios,usuarios_bloqueados):
     #ingresa sus datos el usuario, si es necesario lo bloquea (si falla 3 veces el ingreso del pin)  
     dni = validar_dni("Ingrese su DNI: ")
-    print(usuarios)
+    #print(usuarios)
     while not dni in usuarios:
         print("El dni es incorrecto o usted no tiene un usuario")
         return validar_bloqueo(usuarios,usuarios_bloqueados)
@@ -324,76 +367,27 @@ def validar_bloqueo(usuarios,usuarios_bloqueados):
     
     return(usuarios,dni)
 
-#aca va devolver bicicleta
-def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados):
+def retirar_bicicleta_ingreso(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados):
     #Retira una bicicleta del diccionario estaciones y la pone en circulacion (viajes actuales), verificando que el usuario no esté bloqueado
     usuarios,dni = validar_bloqueo(usuarios,usuarios_bloqueados)
     if dni in viajes_actuales:
         print('Usted ya tiene una bicicleta!')
     else:
         if(dni not in usuarios_bloqueados):
-            numero_bicicleta,estacion,numero_anclaje = elegir_bicicleta_de_estacion(estaciones,bicicletas)
-            while numero_bicicleta != -1:
-                bicicletas[numero_bicicleta][1] = "En circulación"
-                estaciones[estacion][3].remove(numero_bicicleta)
-                print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje+1))
-                horario_salida = generar_horario_salida()
-                viajes_actuales[dni] = [numero_bicicleta, estacion, horario_salida]
-                estaciones[estacion][4] += 1
-                return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
-            print ("No hay bicicletas disponibles, intente en otra estación")
+            retirar_bicicleta("manual", dni, estaciones, bicicletas, usuarios, viajes_actuales)
         else:
             print("Usted esta bloqueado, no puede retirar una bicicleta.")
     return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
 
-def devolver_bicicleta(dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
-    #Devuelve una bicicleta al diccionario estaciones y la quita de circulacion (viajes actuales), verificando el tiempo. En caso de excederse el usuario debe bloquearse
-    while len(estaciones[estacion][3]) < estaciones[estacion][2]: #se fija que haya lugar en la estacion
-        duracion_viaje = randint(5,75)
-        if duracion_viaje > 60:
-            bloquear_usuario(dni,usuarios,usuarios_bloqueados)
-        necesita_reparacion = input("¿La bicicleta necesita reparacion? si/no: ")
-        while necesita_reparacion != "si" and necesita_reparacion!= "no":
-            necesita_reparacion = input("¿La bicicleta necesita reparacion? si/no: ")
-        numero_bicicleta = viajes_actuales[dni][0]
-        if necesita_reparacion == "si":
-            bicicletas[numero_bicicleta][0] = "reparacion"
-        bicicletas[numero_bicicleta][1] = "anclada"
-        horario = viajes_actuales[dni][2].split(':')
-        hora = int(horario[0])
-        minuto = int(horario[1])
-        if( (minuto + duracion_viaje ) >= 60 ):
-            minuto += (duracion_viaje - 60)
-            hora += 1
-        else:
-            minuto += duracion_viaje
-        #agrega el 0 a los minutos si son menores a 10
-        if minuto <10:
-            horario_llegada = str(hora) + ': 0' + str(minuto)
-        else:
-            horario_llegada = str(hora) + ':' + str(minuto)
-        del viajes_actuales[dni] #borra el viaje actual
-        usuarios[dni][3] += duracion_viaje
-        usuarios[dni][4] += 1
-        estaciones[estacion][3].append(numero_bicicleta)
-        viajes_finalizados[dni] = [numero_bicicleta, horario_llegada, estacion]
-        estaciones[estacion][4] += 1 
-        if duracion_viaje > 60:
-                print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}. Al exceder los 60 minutos de uso ha sido bloqueado.\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_llegada))
-        else:
-            print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}.\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_llegada))
-            
-        return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
-
-    print("No hay anclajes disponibles.\n")
-
-
-def elegir_bicicleta_de_estacion(estaciones,bicicletas):
-    estacion = input('Seleccione número de estación: ')
-    claves = estaciones.keys()
-    while not int(estacion) in claves or not estacion.isdigit():
-        estacion = input('Seleccione un número de estación correcto: ')
-    estacion = int(estacion)
+def elegir_bicicleta_de_estacion(forma_a_utilizar, estaciones,bicicletas):
+    if(forma_a_utilizar == "manual"):
+        estacion = input('Seleccione número de estación: ')
+        claves = estaciones.keys()
+        while not int(estacion) in claves or not estacion.isdigit():
+            estacion = input('Seleccione un número de estación correcto: ')
+        estacion = int(estacion)
+    else:
+        estacion =randint(1,10)
     numero_anclaje = 0
     while len(estaciones[estacion][3]) >= numero_anclaje:
         if(len(estaciones[estacion][3]) > 0):
@@ -405,6 +399,7 @@ def elegir_bicicleta_de_estacion(estaciones,bicicletas):
         numero_anclaje += 1
     numero_bicicleta = -1
     return numero_bicicleta, estacion,numero_anclaje
+
 def generar_horario_salida():
     hora = randint(0,22)
     if(hora == 22):
@@ -416,20 +411,74 @@ def generar_horario_salida():
     else:
         horario_salida = str(hora) + ':' + str(minuto)
     return(horario_salida)
+
+def devolver_bicicleta(parametro, dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
+    #Devuelve una bicicleta al diccionario estaciones y la quita de circulacion (viajes actuales), verificando el tiempo. En caso de excederse el usuario debe bloquearse
+    while len(estaciones[estacion][3]) < estaciones[estacion][2]: #se fija que haya lugar en la estacion
+        duracion_viaje = randint(5,75)
+        if duracion_viaje > 60:
+            bloquear_usuario(dni,usuarios,usuarios_bloqueados)
+        numero_bicicleta = viajes_actuales[dni][0]
+        if parametro == "manual":
+            bicicletas = estado_bicicleta_devolucion(numero_bicicleta,bicicletas)
+        else:
+            bicicletas[numero_bicicleta][0] = "ok"
+            bicicletas[numero_bicicleta][1] = "anclada"
+
+        horario_llegada = generar_horario_llegada(dni, viajes_actuales, duracion_viaje)
+        del viajes_actuales[dni] #borra el viaje actual
+        usuarios[dni][3] += duracion_viaje
+        usuarios[dni][4] += 1
+        estaciones[estacion][3].append(numero_bicicleta)
+        viajes_finalizados[dni] = [numero_bicicleta, horario_llegada, estacion]
+        estaciones[estacion][4] += 1 
+        if duracion_viaje > 60:
+            print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}. Al exceder los 60 minutos de uso ha sido bloqueado.\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_llegada))
+        else:
+            print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}.\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_llegada))
+            
+        return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+    print("No hay anclajes disponibles.\n")
+    return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)  
+
+def generar_horario_llegada(dni, viajes_actuales, duracion_viaje):
+    horario = viajes_actuales[dni][2].split(':')
+    hora = int(horario[0])
+    minuto = int(horario[1])
+    if( (minuto + duracion_viaje ) >= 60 ):
+        minuto += (duracion_viaje - 60)
+        hora += 1
+    else:
+        minuto += duracion_viaje
+    #agrega el 0 a los minutos si son menores a 10
+    if minuto <10:
+        horario_llegada = str(hora) + ': 0' + str(minuto)
+    else:
+        horario_llegada = str(hora) + ':' + str(minuto)
+    return (horario_llegada)
+
+def estado_bicicleta_devolucion(numero_bicicleta,bicicletas):
+    necesita_reparacion = input("¿La bicicleta necesita reparacion? si/no: ")
+    while necesita_reparacion != "si" and necesita_reparacion!= "no":
+        necesita_reparacion = input("¿La bicicleta necesita reparacion? si/no: ")
+    if necesita_reparacion == "si":
+        bicicletas[numero_bicicleta][0] = "reparacion"
+    bicicletas[numero_bicicleta][1] = "anclada"
+    return bicicletas
+
 def validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
     dni = validar_dni("Ingrese su numero de dni: ")
     while not dni in usuarios:
         dni = validar_dni("DNI incorrecto. Vuelva a ingresarlo: " )
-    if(len(viajes_actuales) and len(viajes_actuales[dni]) > 0):
+    if dni in viajes_actuales:
         estacion = int(input('Seleccione número de estación: '))
         #Verificar estación
         while not estacion in estaciones:
             estacion = int(input('Seleccione número de estación: '))
-            devolver_bicicleta(dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+        devolver_bicicleta("manual",dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)    
     else:    
         print('No tienes ninguna bicicleta para devolver!')
     return estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados
-
 
 def carga_de_datos_menu(estaciones,bicicletas,usuarios):
     print('1 - Carga automática')
@@ -524,7 +573,7 @@ def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas
     if opcion == '1':
         usuarios,usuarios_bloqueados = modificar_pin(usuarios,usuarios_bloqueados)
     elif opcion == '2':
-        estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados = retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
+        estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados = retirar_bicicleta_ingreso(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
     elif opcion == '3':
          estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
         
@@ -549,16 +598,16 @@ def menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales,
         if opcion == 0:
             seguir = False
         elif opcion == '1':
-            estaciones,bicicletas,usuarios =carga_de_datos_menu(estaciones,bicicletas,usuarios)
+            estaciones,bicicletas,usuarios = carga_de_datos_menu(estaciones,bicicletas,usuarios)
         elif opcion == '2':
-           usuarios,usuarios_bloqueados =  usuarios_menu(usuarios,usuarios_bloqueados)
+           usuarios,usuarios_bloqueados = usuarios_menu(usuarios,usuarios_bloqueados)
         elif opcion == '3':
-            estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = retiros_automaticos_menu (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+            estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = retiros_automaticos_menu (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
         elif opcion == '4':
             informes_menu(estaciones,usuarios,bicicletas_en_reparacion)
         elif opcion == '5':
             #Ingreso al sistema
-            estaciones, usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados =ingreso_al_sistema_menu(estaciones, usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados)
+            estaciones,usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados = ingreso_al_sistema_menu(estaciones, usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados)
         else:
             os.system('clear') #Limpia la terminal
             print('Vuelva a intentarlo')
