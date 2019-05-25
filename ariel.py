@@ -321,10 +321,10 @@ def validar_bloqueo(usuarios,usuarios_bloqueados):
                 bloquear_usuario(dni,usuarios,usuarios_bloqueados)
                 return (usuarios,dni)
         return(usuarios,dni)
-    print("Su usuario esta bloqueado. No puede retirar una bicicleta")
+    
     return(usuarios,dni)
 
-#aca va retirar y devolver bicicleta
+#aca va devolver bicicleta
 def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados):
     #Retira una bicicleta del diccionario estaciones y la pone en circulacion (viajes actuales), verificando que el usuario no esté bloqueado
     usuarios,dni = validar_bloqueo(usuarios,usuarios_bloqueados)
@@ -342,7 +342,51 @@ def retirar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuario
                 estaciones[estacion][4] += 1
                 return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
             print ("No hay bicicletas disponibles, intente en otra estación")
+        else:
+            print("Usted esta bloqueado, no puede retirar una bicicleta.")
     return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
+
+def devolver_bicicleta(dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
+    #Devuelve una bicicleta al diccionario estaciones y la quita de circulacion (viajes actuales), verificando el tiempo. En caso de excederse el usuario debe bloquearse
+    while len(estaciones[estacion][3]) < estaciones[estacion][2]: #se fija que haya lugar en la estacion
+        duracion_viaje = randint(5,75)
+        if duracion_viaje > 60:
+            bloquear_usuario(dni,usuarios,usuarios_bloqueados)
+        necesita_reparacion = input("¿La bicicleta necesita reparacion? si/no: ")
+        while necesita_reparacion != "si" and necesita_reparacion!= "no":
+            necesita_reparacion = input("¿La bicicleta necesita reparacion? si/no: ")
+        numero_bicicleta = viajes_actuales[dni][0]
+        if necesita_reparacion == "si":
+            bicicletas[numero_bicicleta][0] = "reparacion"
+        bicicletas[numero_bicicleta][1] = "anclada"
+        horario = viajes_actuales[dni][2].split(':')
+        hora = int(horario[0])
+        minuto = int(horario[1])
+        if( (minuto + duracion_viaje ) >= 60 ):
+            minuto += (duracion_viaje - 60)
+            hora += 1
+        else:
+            minuto += duracion_viaje
+        #agrega el 0 a los minutos si son menores a 10
+        if minuto <10:
+            horario_llegada = str(hora) + ': 0' + str(minuto)
+        else:
+            horario_llegada = str(hora) + ':' + str(minuto)
+        del viajes_actuales[dni] #borra el viaje actual
+        usuarios[dni][3] += duracion_viaje
+        usuarios[dni][4] += 1
+        estaciones[estacion][3].append(numero_bicicleta)
+        viajes_finalizados[dni] = [numero_bicicleta, horario_llegada, estacion]
+        estaciones[estacion][4] += 1 
+        if duracion_viaje > 60:
+                print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}. Al exceder los 60 minutos de uso ha sido bloqueado.\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_llegada))
+        else:
+            print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}.\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_llegada))
+            
+        return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+
+    print("No hay anclajes disponibles.\n")
+
 
 def elegir_bicicleta_de_estacion(estaciones,bicicletas):
     estacion = input('Seleccione número de estación: ')
