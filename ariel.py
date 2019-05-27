@@ -30,7 +30,7 @@ def carga_datos_random(estaciones, bicicletas, usuarios):
     return (estaciones,bicicletas,usuarios)
 
 def cargar_estaciones(estaciones):
-    #acumular_lugares_para_anclar = 0
+    #carga las estaciones
     numero_direccion = 100
     direccion = "Av. Rivadavia {} ".format(numero_direccion)
     latitud = -34.6038
@@ -161,38 +161,6 @@ def validar_celular (mensaje):
     else:
         return validar_celular("Ingrese un numero de celular valido:")
  
-"""      
-def ingresar_usuario_modificacion(usuarios):
-    #Recibe el diccionario usuario y verifica si los datos ingresados corresponden a un usuario existente,
-    # y le permite modificar su pin.
-    dni = validar_dni("Ingrese su DNI: ")
-    pin = validar_pin("Ingrese su pin: ")
-    existencia_usuario =  validar_usuario(dni,pin,usuarios)
-    
-    while existencia_usuario == "no existe":
-        print("El dni es incorrecto o usted no tiene un usuario")
-        return ingresar_usuario_modificacion(usuarios)
-    while existencia_usuario == "pin incorrecto":
-        print("El PIN es incorrecto")
-        pin = validar_pin("Ingrese su pin: ")
-        existencia_usuario = validar_usuario(dni,pin,usuarios)
-    while existencia_usuario == "existe":
-        print ("Bienvenido ", usuarios[dni][0])
-        usuarios = modificar_pin(dni,usuarios)
-        return(usuarios) 
-     
-def validar_usuario(dni,pin,usuarios):
-    #Recibe el diccionario usuarios 
-    #Verifica si los datos ingresados corresponden a un usuario existente.
-    #verifica si el pin es igual al ingresado
-    if not dni in usuarios:
-        return "no existe"
-    else:
-        if usuarios[dni][2] == pin:
-            return "existe"
-        else:
-            return "pin incorrecto"
-"""    
 def modificar_pin(usuarios,usuarios_bloqueados):
     #Recibe el dni y modifica su pin
     usuarios, dni = validar_bloqueo(usuarios,usuarios_bloqueados)
@@ -263,6 +231,7 @@ def seleccionar_usuario(usuarios, viajes_actuales,usuarios_bloqueados):
 #ACA VAN LAS DOS SIMULACIONES
 
 def retirar_bicicleta(parametro, dni, estaciones, bicicletas, usuarios, viajes_actuales):
+    #retira la bicicleta y muestra la accion al usuario
     numero_bicicleta,estacion,numero_anclaje = elegir_bicicleta_de_estacion(parametro,estaciones,bicicletas)
     while numero_bicicleta != -1:
         bicicletas[numero_bicicleta][1] = "En circulación"
@@ -278,14 +247,15 @@ def retirar_bicicleta(parametro, dni, estaciones, bicicletas, usuarios, viajes_a
             
         return (estacion,estaciones, bicicletas, usuarios, viajes_actuales)
     print ("No hay bicicletas disponibles, intente en otra estación")
-
+    return (estacion,estaciones, bicicletas, usuarios, viajes_actuales)
 
 def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
     #Simula retiro y devolución de una bicicleta
     for numero_ejecucion in range(0,int(cantidad_ejecuciones)):
         dni = seleccionar_usuario(usuarios,viajes_actuales,usuarios_bloqueados)
         if dni != -1: #si es -1, no hay usuarios disponibles 
-            print (numero_ejecucion+1)
+            print (numero_ejecucion+1) #muestra el numero de simulacion
+            #saco bici
             estacion,estaciones, bicicletas, usuarios, viajes_actuales = retirar_bicicleta("simulacion", dni, estaciones, bicicletas, usuarios, viajes_actuales)
             #busco al azar la estacion a devolver la bicicleta 
             estacion_devolucion = estacion
@@ -380,6 +350,7 @@ def retirar_bicicleta_ingreso(estaciones, bicicletas, usuarios, viajes_actuales,
     return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
 
 def elegir_bicicleta_de_estacion(forma_a_utilizar, estaciones,bicicletas):
+    #elije la estacion, la bicicleta y devuelve el numero de la bicicleta, numero de estacion y el anclaje donde esta ubicada
     if(forma_a_utilizar == "manual"):
         estacion = input('Seleccione número de estación: ')
         claves = estaciones.keys()
@@ -401,6 +372,7 @@ def elegir_bicicleta_de_estacion(forma_a_utilizar, estaciones,bicicletas):
     return numero_bicicleta, estacion,numero_anclaje
 
 def generar_horario_salida():
+    #devuelve el horario generado al azar del retiro de la bicicleta
     hora = randint(0,22)
     if(hora == 22):
         minuto = randint(0,30) 
@@ -442,6 +414,7 @@ def devolver_bicicleta(parametro, dni,estacion,estaciones,bicicletas,usuarios,us
     return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)  
 
 def generar_horario_llegada(dni, viajes_actuales, duracion_viaje):
+    #recibe los viajes actuales y la duracion del viaje, devuelve el horario de llegada calculado a partir del horario de salida y la duracion
     horario = viajes_actuales[dni][2].split(':')
     hora = int(horario[0])
     minuto = int(horario[1])
@@ -458,6 +431,7 @@ def generar_horario_llegada(dni, viajes_actuales, duracion_viaje):
     return (horario_llegada)
 
 def estado_bicicleta_devolucion(numero_bicicleta,bicicletas):
+    #el usuario ingresa si la bici necesita reparacion o no cuando la devuelve, devuelve el diccionario bicicletas actualizado
     necesita_reparacion = input("¿La bicicleta necesita reparacion? si/no: ")
     while necesita_reparacion != "si" and necesita_reparacion!= "no":
         necesita_reparacion = input("¿La bicicleta necesita reparacion? si/no: ")
@@ -467,6 +441,7 @@ def estado_bicicleta_devolucion(numero_bicicleta,bicicletas):
     return bicicletas
 
 def validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
+    #pide los datos para devolver la bicicleta, en caso de ser validos y tener una bicicleta, la devuelve
     dni = validar_dni("Ingrese su numero de dni: ")
     while not dni in usuarios:
         dni = validar_dni("DNI incorrecto. Vuelva a ingresarlo: " )
