@@ -1,14 +1,15 @@
 GRUPO POLILLA:
 
 -Ariel Pisterman 103936
--Julian Porge 104286
+-Julian Gorge 104286
 -Julieta Ponti 104694
 -Franco Cuppari 104098
 
 Aclaraciones:
-- cargar datos para poder usar las estaciones, bicicletas y usuarios, ya sea a mano o aleatoriamente
-- un usuario existente luego de cargar los datos: dni = 10000000 , pin = 1010
-- en la funcion modificar pin, la validacion de 3 intentos esta hecha ingresando pins validos, los pins invalidos no cuentan.
+- Cargar datos para poder usar las estaciones, bicicletas y usuarios, ya sea a mano o aleatoriamente
+- Un usuario existente luego de cargar los datos: dni = 10000000 , pin = 1010
+- En la funcion modificar pin, la validacion de 3 intentos esta hecha ingresando pins validos, los pins invalidos no cuentan.
+- la funcion modificar_pin y retirar_bicicleta utilizan la misma funcion de ingreso de datos, por lo tanto en modificar_pin tambien se puede bloquear el usuario
 
 #
 ##########################################################################################

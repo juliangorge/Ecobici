@@ -158,8 +158,8 @@ def modificar_pin(usuarios,usuarios_bloqueados):
             pin_nuevo2 = validar_pin("Reingrese su pin: ")
         usuarios[dni][2] = pin_nuevo
         print("Su nuevo pin es: ",pin_nuevo)
-        
-    print("Su usuario esta bloqueado, no puede modificar su pin.")
+    else:
+        print("Su usuario esta bloqueado, no puede modificar su pin.")
     return (usuarios,usuarios_bloqueados)
     
 def bloquear_usuario(dni,usuarios,usuarios_bloqueados):
@@ -372,14 +372,14 @@ def generar_horario_salida():
         horario_salida = str(hora) + ':' + str(minuto)
     return(horario_salida)
 
-def devolver_bicicleta(parametro, dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
+def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
     #Devuelve una bicicleta al diccionario estaciones y la quita de circulacion (viajes actuales), verificando el tiempo. En caso de excederse el usuario debe bloquearse
     if len(estaciones[estacion][3]) < estaciones[estacion][2]: #se fija que haya lugar en la estacion
         duracion_viaje = randint(5,75)
         if duracion_viaje > 60:
             bloquear_usuario(dni,usuarios,usuarios_bloqueados)
         numero_bicicleta = viajes_actuales[dni][0]
-        if parametro == "manual":
+        if forma_de_uso == "manual":
             bicicletas = estado_bicicleta_devolucion(numero_bicicleta,bicicletas)
         else:
             bicicletas[numero_bicicleta][0] = "ok"
