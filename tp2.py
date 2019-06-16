@@ -20,7 +20,7 @@ def carga_de_datos_menu (estaciones, bicicletas, usuarios):
         print('Datos aleatorios cargados!\n')
     elif opcion == '0':
         os.system('clear') #Limpia la terminal
-    return (estaciones,bicicletas,usuarios)
+    return (estaciones, bicicletas, usuarios)
 
 def usuarios_menu (usuarios, usuarios_bloqueados):
     print('1 - Listado')
@@ -43,7 +43,7 @@ def usuarios_menu (usuarios, usuarios_bloqueados):
         usuarios,usuarios_bloqueados = desbloquear_usuario(usuarios, usuarios_bloqueados)
     elif opcion == '0':
         os.system('clear') #Limpia la terminal
-    return (usuarios,usuarios_bloqueados)
+    return (usuarios, usuarios_bloqueados)
 
 def retiros_automaticos_menu (estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales, viajes_finalizados):
     print('1 - Viaje aleatorio')
@@ -59,7 +59,7 @@ def retiros_automaticos_menu (estaciones, bicicletas, usuarios, usuarios_bloquea
         estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = simulacion_con_parametro(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
     elif opcion == '0':
         os.system('clear') #Limpia la terminal
-    return (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+    return (estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales, viajes_finalizados)
 
 def informes_menu (estaciones, usuarios, bicicletas_en_reparacion):
     print('1 - Usuarios con mayor cantidad de viajes')
@@ -94,12 +94,12 @@ def ingreso_al_sistema_menu (estaciones, usuarios, usuarios_bloqueados, biciclet
     if opcion == '1':
         usuarios,usuarios_bloqueados = modificar_pin(usuarios,usuarios_bloqueados)
     elif opcion == '2':
-        estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados = retirar_bicicleta_ingreso(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
+        estaciones,bicicletas, usuarios, viajes_actuales, usuarios_bloqueados = retirar_bicicleta_ingreso(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
     elif opcion == '3':
         estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
     elif opcion == '0':
         os.system('clear') #Limpia la terminal
-    return (estaciones,usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados)
+    return (estaciones, usuarios, usuarios_bloqueados, bicicletas, bicicletas_en_reparacion, viajes_actuales, viajes_finalizados)
 
 ##############################
 ######     MAIN CODE    ######
@@ -147,3 +147,19 @@ bicicletas_en_reparacion = []
 os.system('clear') ##Limpia la terminal
 
 menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales, viajes_finalizados, bicicletas_en_reparacion)
+
+# Funciones:
+# Ariel: Treaer archivos (leer y asignar bicicletas a estaciones)
+# Franco: dar de alta un suaurio (TP1)
+# Julieta: ingresar al sistema (TP1)
+# Julian: retirar y devolver (TP1)
+# Ariel: Simula muchas veces (agregar distancia recorrida en km) -> Haversigne (geopy)
+# Informes.
+
+# Adicionales TP2.
+# Guardar usuarios creados en archivo maestro usuarios.
+# Generar maestro usuarios con los 4 archivos de usuarios (en cara de que existan).
+# Viajes en curso se guardan en archivo binario.
+# Al comenzar el programa se finalizan los viajes en curso.
+# Roban bici e ingresar al sistema.
+# Informe de bicicletas robadas y viajes robadas.
