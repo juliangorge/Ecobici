@@ -150,12 +150,12 @@ menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales, via
 
 # Funciones:
 # Ariel: Treaer archivos (leer y asignar bicicletas a estaciones)
-# Franco: dar de alta un suaurio (TP1)
-# Julieta: ingresar al sistema (TP1)
-# Julian: retirar y devolver (TP1)
+# Franco: dar de alta un usuario (TP1), guardar viajes finalizados en archivo
+# Julieta: ingresar al sistema (TP1), guardar viajes en curso en archivo binario
+# Julian: ACORDATE CAMBIAR ARCHIVOS DE USUARIOS Y VIAJES POR LOS CORREGIDOS generar maestro usuarios con los 4 archivos de usuario,  retirar y devolver (TP1), 
 # Ariel: Simula muchas veces (agregar distancia recorrida en km) -> Haversigne (geopy)
-# Informes.
 
+# Informes.
 # Adicionales TP2.
 # Guardar usuarios creados en archivo maestro usuarios.
 # Generar maestro usuarios con los 4 archivos de usuarios (en cara de que existan).

@@ -36,8 +36,8 @@ longitud,latitud,direccion,identificador,capacidad
 -58.3828953844952,-34.5969901800416,Cerrito y Marcelo T. de Alvear,38,28
 -58.4075919835788,-34.636519409884,Gral Urquiza y Rondeau,41,22
 -58.398717085205796,-34.5971266094165,Uriburu y Marcelo T. de Alvear,33,28
--58.374157286157704,-34.5995794260034,"San Martín 710, entre Viamonte y Córdoba",34,27
--58.373371100742,-34.6043980605276,"Sarmiento 481, entre Reconquista y San Martín",40,28
+-58.374157286157704,-34.5995794260034,"San Martín 710 entre Viamonte y Córdoba",34,27
+-58.373371100742,-34.6043980605276,"Sarmiento 481 entre Reconquista y San Martín",40,28
 -58.414594877753494,-34.5754853233668,Av Del Libertador y Av Sarmiento,44,27
 -58.3824487653053,-34.6015861695762,Tucumán y Cerrito,51,21
 -58.374388824542706,-34.6163784807971,Perú 726,46,20
@@ -59,7 +59,7 @@ longitud,latitud,direccion,identificador,capacidad
 -58.439709218240296,-34.603162361388605,Padilla y Warnes Av,31,15
 -58.449442063758795,-34.5918191166975,Guzmán y Leiva,94,18
 -58.382842967720606,-34.6029957670657,Av. Roque Saenz Peña 1149 entre Libertad y Cerrito,71,22
--58.434242799113996,-34.604571775755,"Av. Patricias Argentinas 401, entre Juana de Ibarbourou y Av. Machado",74,28
+-58.434242799113996,-34.604571775755,"Av. Patricias Argentinas 401 entre Juana de Ibarbourou y Av. Machado",74,28
 -58.3735574617984,-34.6107824192457,Bolivar entre Adolfo Alsina y Moreno,47,22
 -58.3708343749879,-34.6090860400313,Balcarce 101 entre Av. Hipólito Yrigoyen y Alsina,61,25
 -58.3781735400286,-34.6020919024436,Esmeralda 510,95,22
@@ -96,7 +96,7 @@ longitud,latitud,direccion,identificador,capacidad
 -58.4050191499757,-34.6317246877284,Salcedo 2908 y Dean Funes,92,19
 -58.3948309043474,-34.6112703094325,Sarandí entre Adolfo Alsina e Hipólito Yrigoyen,77,16
 -58.398904702934196,-34.6121235856114,Pichincha entre Adolfo Alsina y Moreno,75,29
--58.409110475451705,-34.6175490894938,"Agrelo entre  Gral. Urquiza, y Gral. La Rioja",120,22
+-58.409110475451705,-34.6175490894938,"Agrelo entre  Gral. Urquiza y Gral. La Rioja",120,22
 -58.360905798483,-34.6118079128888,Azucena Villaflor 553 entre Calabria y Aimé Painé,151,29
 -58.4429012738521,-34.5998125732878,Acevedo y Padilla,136,16
 -58.4424227041164,-34.5890491463383,Fitz Roy 1092 y Loyola,101,29
@@ -175,15 +175,15 @@ longitud,latitud,direccion,identificador,capacidad
 -58.407965559468,-34.5778491087657,Plaza Alemania: Del Libertador Av y Cavia,156,27
 -58.4119247639604,-34.6120200280467,Hipólito Yrigoyen y 24 de Noviembre,169,22
 -58.391548775098705,-34.5972614724898,Marcelo T De Alvear 1698 y Rodríguez Peña,174,25
--58.4121585445467,-34.5680738913864,"Av. Roldan, Belisario y Av. Sarmiento",177,24
+-58.4121585445467,-34.5680738913864,"Av. Roldan Belisario y Av. Sarmiento",177,24
 -58.42486660380939,-34.623457406189296,José Marmol 803 y Estados Unidos,178,28
 -58.4204709626304,-34.619802649015,Castro 680 entre México y Agrelo,180,18
 -58.389691907404696,-34.6156376341942,México 1652 entre Virrey Cevallos y Solís,183,23
--58.4217825750943,-34.6313699718195,"33 Orientales 1439, entre Av. Pavón y Av. Garay",185,27
+-58.4217825750943,-34.6313699718195,"33 Orientales 1439 entre Av. Pavón y Av. Garay",185,27
 -58.40714252984551,-34.6125512856829,Adolfo Alsina 2910 y Catamarca,186,30
 -58.3856151032862,-34.5977988046358,Talcahuano 1034 y Marcelo T de Alvear,192,20
 -58.40597385351211,-34.591110880844695,Arenales 2882 y Aguero,193,17
--58.4225720421175,-34.605952483313395,"Perón, Juan Domingo Tte 3989 entre Francisco Acuña de Figueroa y Medrano",194,24
+-58.4225720421175,-34.605952483313395,"Perón Juan Domingo Tte 3989 entre Francisco Acuña de Figueroa y Medrano",194,24
 -58.433506016027,-34.6107962769337,Aranguren 188 entre Portugal y Eduardo Acevedo,188,23
 -58.3913186324946,-34.630678908608,Pedro Echague 1878 entre Combate de los Pozos y Av Entre Ríos,184,24
 -58.3855860204811,-34.588474694640695,Posadas 1350 entre Montevideo y Rodríguez Peña,189,16
