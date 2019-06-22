@@ -35,3 +35,58 @@ def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios
     else:
         print("No hay anclajes disponibles.\n")
     return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)  
+
+################################################################################################
+
+
+# ROBAR BICi
+# ROBAR BICi
+# ROBAR BICI
+
+def retirar_bicicleta_robando(dni, estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados):
+    bicicleta = input('Seleccione número de bicicleta: ')
+    claves = bicicletas.keys()
+    while not int(bicicleta) in claves or not bicicleta.isdigit():
+        bicicleta = input('Seleccione un número de bicicleta correcto: ')
+    bicicleta = int(bicicleta)
+
+    #Revisar si bicicleta está en viajes actuales, sino bloquear
+    bloquear = True
+    for datos in viajes_actuales.values():
+        if(datos[0] == bicicleta):
+            bloquear = False
+
+            #Obtengo DNI del asaltado
+            usuario_asaltado = [dni for dni, datos_ in viajes_actuales.items() if datos_[0] == bicicleta]
+
+            #Elimino el viaje actual del asaltado, generando uno identico pero con el DNI del ladron
+            del viajes_actuales[usuario_asaltado[0]]
+            viajes_actuales[dni] = [ bicicleta, datos[1], datos[2] ]
+
+    for dni_, usuario in usuarios.items():
+        if dni == dni_:
+            if(bloquear):
+                bloquear_usuario(dni,usuarios,usuarios_bloqueados)
+                return 'bloqueado', dni_, usuarios[dni][0]
+            else:
+                return 'robo', dni_, usuarios[dni][0]
+
+def robar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados):
+    #Retira una bicicleta del diccionario estaciones y la pone en circulacion (viajes actuales), verificando que el usuario no esté bloqueado
+    usuarios,dni = validar_bloqueo(usuarios,usuarios_bloqueados)
+    if dni in viajes_actuales:
+        print('Usted ya tiene una bicicleta!')
+    else:
+        if(dni not in usuarios_bloqueados):
+            estado, dni_ladron, nombre_ladron = retirar_bicicleta_robando(dni, estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
+
+            if(dni == dni_ladron):
+                if(estado == 'bloqueado'):
+                    print('El usuario ',nombre_ladron,'fue bloqueado por intento de robo')
+                else:
+                    print('El usuario ',nombre_ladron,'ha robado una bicicleta!')
+
+        else:
+            print("Usted esta bloqueado, no puede retirar una bicicleta.")
+    return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
+# ROBAR BICI

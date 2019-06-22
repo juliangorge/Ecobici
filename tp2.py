@@ -302,10 +302,25 @@ def informes_menu (estaciones, usuarios, bicicletas_en_reparacion):
     elif opcion == '0':
         os.system('clear') #Limpia la terminal
 
+# ROBAR BICI
+def robar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados):
+    #Retira una bicicleta del diccionario estaciones y la pone en circulacion (viajes actuales), verificando que el usuario no esté bloqueado
+    usuarios,dni = validar_bloqueo(usuarios,usuarios_bloqueados)
+    if dni in viajes_actuales:
+        print('Usted ya tiene una bicicleta!')
+    else:
+        if(dni not in usuarios_bloqueados):
+            retirar_bicicleta("manual", dni, estaciones, bicicletas, usuarios, viajes_actuales)
+        else:
+            print("Usted esta bloqueado, no puede retirar una bicicleta.")
+    return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
+# ROBAR BICI
+
 def ingreso_al_sistema_menu (estaciones, usuarios, usuarios_bloqueados, bicicletas, bicicletas_en_reparacion, viajes_actuales, viajes_finalizados):
     print('1 - Modificar PIN')
     print('2 - Retirar Bicicleta')
     print('3 - Devolver bicicletas')
+    print('4 - ROBAR bicicletas')
     print('0 - Salir')
     opcion = input('Elige una opción para continuar: ')
     while opcion not in ['1','2','3','0']:
@@ -317,6 +332,8 @@ def ingreso_al_sistema_menu (estaciones, usuarios, usuarios_bloqueados, biciclet
         estaciones,bicicletas, usuarios, viajes_actuales, usuarios_bloqueados = retirar_bicicleta_ingreso(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
     elif opcion == '3':
         estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+    elif opcion == '4':
+        robar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
     elif opcion == '0':
         os.system('clear') #Limpia la terminal
     return (estaciones, usuarios, usuarios_bloqueados, bicicletas, bicicletas_en_reparacion, viajes_actuales, viajes_finalizados)
