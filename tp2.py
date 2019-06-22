@@ -23,17 +23,17 @@ def recorrer_archivo(direccion):
     archivo.close()
     return informacion_archivo
 
-def lectura_estaciones(direccion):
+def lectura_estaciones():
     lista_estaciones = recorrer_archivo("estaciones.csv")
     estaciones = {}
+    bicicletas_ancladas = []
+    cantidad_usos_estacion = 0
     for datos_estacion in lista_estaciones:
         #longitud,latitud,direccion,capacidad, bicicletas_ancladas, cantidad_usos
-        bicicletas_ancladas = []
-        cantidad_usos_estacion = 0
         estaciones[int(datos_estacion[3])] = [datos_estacion[0],datos_estacion[1],datos_estacion[2],datos_estacion[4], bicicletas_ancladas,cantidad_usos_estacion]
     return estaciones
-    
-def lectura_bicicletas(direccion,estaciones):
+
+def lectura_bicicletas(estaciones):
     lista_bicicletas = recorrer_archivo("bicicletas.csv")
     bicicletas = {}
     #estado,ubicacion
@@ -41,21 +41,93 @@ def lectura_bicicletas(direccion,estaciones):
     ubicacion = "anclada"
     numeros_estaciones =[]
     for estacion in estaciones:
-        numeros_estaciones.append(estacion)
+        numeros_estaciones.append(int(estacion))
+    longitud_numeros_estaciones = len(numeros_estaciones) - 1
     for datos_bicicleta in lista_bicicletas:
-        bicicletas[datos_bicicleta[1]] = [estado,ubicacion]
-        posicion_estacion = randint(0,len(numeros_estaciones)-1)
+        numero_bicicleta = int(datos_bicicleta[1])
+        bicicletas[numero_bicicleta] = [estado,ubicacion]
+        posicion_estacion = randint(0,longitud_numeros_estaciones)
         numero_estacion = numeros_estaciones[posicion_estacion]
-        while (len(estaciones[numero_estacion][4]) >= 30):
-            numero_estacion = randint(0,len(numeros_estaciones))
-        estaciones[numero_estacion][4].append(datos_bicicleta[1])
-    return bicicletas, estaciones
+        while (len(estaciones[numero_estacion][4]) >= 29): #sub4 esta la lista de bicicletas ancladas
+            posicion_estacion = randint(0,longitud_numeros_estaciones)
+            numero_estacion = numeros_estaciones[posicion_estacion]
+        estaciones[numero_estacion][4].append(numero_bicicleta)
+    return bicicletas, estaciones    
 
+
+def leer_archivo_usuarios(archivo, vacio):
+
+    linea = archivo.readline() #guarda una cadena de caracteres del archivo
+    if linea:
+        lista = linea.rstrip().split(",")
+        if lista[2] == 'dni':
+            return leer_archivo(archivo, vacio)
+        return lista[0], lista[1],int(lista[2]),lista[3]
+    else:
+        return (vacio)
+
+def merge_usuarios():
+    usuarios1 = open('usuarios1.csv','r',encoding = 'utf-8')
+    usuarios2 = open('usuarios2.csv','r',encoding = 'utf-8')
+    usuarios3 = open('usuarios3.csv','r',encoding = 'utf-8')
+    usuarios4 = open('usuarios4.csv','r',encoding = 'utf-8')
+    nombre1,celular1,dni1,pin1 = leer_archivo_usuarios(usuarios1, [0,0,999999999,0])
+    nombre2,celular2,dni2,pin2 = leer_archivo_usuarios(usuarios2,[0,0,999999999,0])
+    nombre3,celular3,dni3,pin3 = leer_archivo_usuarios(usuarios3, [0,0,999999999,0])
+    nombre4,celular4,dni4,pin4 = leer_archivo_usuarios(usuarios4, [0,0,999999999,0])
+
+    maestro_usuarios = open('maestro_usuarios.csv','w',encoding = 'utf-8')
+    while dni1 !=999999999 or dni2 !=999999999 or dni3 !=999999999 or dni4 !=999999999:
+        menor = min(int(dni1),int(dni2),int(dni3),int(dni4))
+        while menor  == dni1 and dni1 !=0:
+            linea = "{},{},{},{} \n".format(nombre1,celular1,dni1,pin1)
+            maestro_usuarios.write(linea)
+            nombre1,celular1,dni1,pin1 = leer_archivo(usuarios1,[0,0,999999999,0])
+        while menor  == dni2 and dni2 !=0:
+            linea = "{},{},{},{} \n".format(nombre2,celular2,dni2,pin2)
+            maestro_usuarios.write(linea)
+            nombre2,celular2,dni2,pin2 = leer_archivo(usuarios2,[0,0,999999999,0])
+        while menor  == dni3 and dni3 !=0:
+            linea = "{},{},{},{} \n".format(nombre3,celular3,dni3,pin3)
+            maestro_usuarios.write(linea)
+            nombre3,celular3,dni3,pin3= leer_archivo(usuarios3,[0,0,999999999,0])
+        while menor  == dni4 and dni4 !=0:
+            linea = "{},{},{},{} \n".format(nombre4,celular4,dni4,pin4)
+            maestro_usuarios.write(linea)
+            nombre4,celular4,dni4,pin4 = leer_archivo(usuarios4,[0,0,999999999,0])
+    usuarios1.close()
+    usuarios2.close()
+    usuarios3.close()
+    usuarios4.close()
+    maestro_usuarios.close()
+
+def lectura_usuarios():
+    lista_usuarios = recorrer_archivo("maestro_usuarios.csv")
+    usuarios = {}
+    tiempo_de_viaje = 0
+    cantidad_viajes = 0
+    for datos_usuario in lista_usuarios:
+        #usuarios[dni] = [nombre,celular,pin,tiempo_de_viaje,cantidad_viajes]
+        usuarios[datos_usuario[2]] = [datos_usuario[0],datos_usuario[1],datos_usuario[3], tiempo_de_viaje,cantidad_viajes]
+    return usuarios
 def carga_de_datos():
-    estaciones =  lectura_estaciones('estaciones.csv')
-    bicicletas, estaciones = lectura_bicicletas ('bicicletas.csv',estaciones)
-    #usuarios = lectura_usuariosn('usuarios.csv')
-    return estaciones, bicicletas
+    estaciones =  lectura_estaciones()
+    bicicletas, estaciones = lectura_bicicletas (estaciones)
+    print (estaciones)
+    print(bicicletas)
+    merge_usuarios()
+    usuarios = lectura_usuarios()
+    return estaciones, bicicletas, usuarios
+
+def listar_usuarios(usuarios):
+    #muestra un listado de usuarios
+    lista_usuarios = []
+    for dni in usuarios:
+        lista_usuarios.append([dni, usuarios[dni][0]])
+    lista_usuarios.sort(key= lambda usuario: usuario[0])
+    print("Usuarios en el sistema: ", len(lista_usuarios))
+    for indice in range(0,len(lista_usuarios)):
+        print((indice+1), lista_usuarios[indice][0], lista_usuarios[indice][1] )
 
 def alta_usuario(usuarios):
     #Recibe el diccionario de usuarios y añado uno nuevo, luego de validar los datos ingresados por el usuario
@@ -137,6 +209,38 @@ def cambiar_pin_archivo(dni,pin_nuevo):
         archivo_usuarios.write(linea)
     archivo_usuarios.close()
 
+def validar_bloqueo(usuarios,usuarios_bloqueados):
+    #ingresa sus datos el usuario, si es necesario lo bloquea (si falla 3 veces el ingreso del pin)  
+    dni = validar_dni("Ingrese su DNI: ")
+    #print(usuarios)
+    while not dni in usuarios:
+        print("El dni es incorrecto o usted no tiene un usuario")
+        return validar_bloqueo(usuarios,usuarios_bloqueados)
+    while not dni in usuarios_bloqueados:
+        claves_usuarios = usuarios.keys()
+        while not dni in claves_usuarios:
+            print("El usuario no existe, ingrese un usuario valido ")
+            return validar_bloqueo(usuarios,usuarios_bloqueados)    
+        intentos = 2 #Considerando el primer INGRESO como intento nº1
+        pin = validar_pin("Ingrese su pin: ")
+        while usuarios[dni][2] != pin:
+            if(intentos <= 3):
+                intentos += 1
+                pin = validar_pin("Su pin es incorrecto. Ingreselo nuevamente: ")
+            else:   
+                bloquear_usuario(dni,usuarios,usuarios_bloqueados)
+                return (usuarios,dni)
+        return(usuarios,dni)
+    
+    return(usuarios,dni)
+
+def bloquear_usuario(dni,usuarios,usuarios_bloqueados):
+    #Recibe la lista de usuarios bloqueados añade el usuario a bloquear
+    usuarios_bloqueados.append(dni)
+    usuarios[dni][2] = None
+    print('Usuario bloqueado!')
+    return (usuarios,usuarios_bloqueados)
+
 def usuarios_menu (usuarios, usuarios_bloqueados):
     print('1 - Listado')
     print('2 - Alta')
@@ -181,9 +285,10 @@ def informes_menu (estaciones, usuarios, bicicletas_en_reparacion):
     print('2 - Usuarios con mayor duración acumulada de viajes')
     print('3 - Bicicletas en reparación')
     print('4 - Estaciones más activas')
+    print('5 - Reporte de robos')
     print('0 - Salir')
     opcion = input('Elige una opción para continuar: ')
-    while opcion not in ['1','2','3','4','0']:
+    while opcion not in ['1','2','3','4', '5', '0']:
         print('La opción es incorrecta.\n')
         opcion = input('Elige una opción para continuar: ')
     if opcion == '1':
