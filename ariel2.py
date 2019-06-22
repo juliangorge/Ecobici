@@ -22,7 +22,7 @@ def recorrer_archivo(direccion):
     return informacion_archivo
 
 def lectura_estaciones():
-    lista_estaciones = recorrer_archivo("estaciones.csv")
+    lista_estaciones = recorrer_archivo("Ecobici/estaciones.csv")
     estaciones = {}
     bicicletas_ancladas = []
     cantidad_usos_estacion = 0
@@ -32,7 +32,7 @@ def lectura_estaciones():
     return estaciones
 
 def lectura_bicicletas(estaciones):
-    lista_bicicletas = recorrer_archivo('bicicletas.csv')
+    lista_bicicletas = recorrer_archivo('Ecobici/bicicletas.csv')
     #estado,ubicacion
     estado  = "ok"
     ubicacion = "anclada"
@@ -40,27 +40,36 @@ def lectura_bicicletas(estaciones):
     bicicletas = {}
     for estacion in estaciones:
         numeros_estaciones.append(estacion)
+    
     for datos_bicicleta in lista_bicicletas:
         bicicletas[datos_bicicleta[1]] = [estado,ubicacion]
         
         posicion_estacion = randint(0, (len(numeros_estaciones)-1))
         numero_estacion = numeros_estaciones[posicion_estacion]
+
         while (len(estaciones[numero_estacion][4]) >= 30):
             posicion_estacion = randint(0, (len(numeros_estaciones)-1))
             numero_estacion = numeros_estaciones[posicion_estacion]
+        
+        #print('bici #',datos_bicicleta[1],'--> estacion #',numero_estacion)
         estaciones[numero_estacion][4].append(datos_bicicleta[1])
+        #print(datos_bicicleta[1])
+        #print(numero_estacion,':',estaciones[numero_estacion][4])
+        
+    #print(estaciones)
     return bicicletas, estaciones
 
 def carga_de_datos():
     estaciones =  lectura_estaciones()
-    print(estaciones)
+    
     bicicletas, estaciones = lectura_bicicletas(estaciones)
     
+    #print(estaciones)
     #merge_usuarios()
     #usuarios = lectura_usuarios()
     return estaciones, bicicletas
 
 
-estaciones,bicicletas =carga_de_datos()
-print (estaciones)
-print(bicicletas)
+estaciones, bicicletas = carga_de_datos()
+#print (estaciones)
+#print(bicicletas)
