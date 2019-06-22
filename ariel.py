@@ -84,7 +84,7 @@ def recorrer_archivo(direccion):
     return informacion_archivo
 
 def lectura_estaciones():
-    lista_estaciones = recorrer_archivo("estaciones.csv")
+    lista_estaciones = recorrer_archivo("Ecobici/bicicletas.csv")
     estaciones = {}
     bicicletas_ancladas = []
     cantidad_usos_estacion = 0
@@ -94,7 +94,7 @@ def lectura_estaciones():
     return estaciones
 
 def lectura_bicicletas(estaciones):
-    lista_bicicletas = recorrer_archivo('bicicletas.csv')
+    lista_bicicletas = recorrer_archivo('Ecobici/bicicletas.csv')
     #estado,ubicacion
     estado  = "ok"
     ubicacion = "anclada"
@@ -114,7 +114,7 @@ def lectura_bicicletas(estaciones):
     return bicicletas, estaciones
 
 def lectura_bicicletas2(estaciones):
-    lista_bicicletas = recorrer_archivo("bicicletas.csv")
+    lista_bicicletas = recorrer_archivo("Ecobici/bicicletas.csv")
     bicicletas = {}
     #estado,ubicacion
     estado  = "ok"
