@@ -191,7 +191,7 @@ def lectura_usuarios():
     return usuarios
 def carga_de_datos():
     estaciones =  lectura_estaciones()
-    #print(estaciones)
+    print(estaciones)
     bicicletas, estaciones = lectura_bicicletas(estaciones)
     
     #merge_usuarios()
