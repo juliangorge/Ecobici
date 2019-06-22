@@ -397,5 +397,4 @@ menu(estaciones, bicicletas, usuarios, usuarios_bloqueados, viajes_actuales, via
 # Generar maestro usuarios con los 4 archivos de usuarios (en cara de que existan).
 # Viajes en curso se guardan en archivo binario.
 # Al comenzar el programa se finalizan los viajes en curso.
-# Roban bici e ingresar al sistema.
 # Informe de bicicletas robadas y viajes robadas.
