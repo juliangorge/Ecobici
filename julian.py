@@ -27,7 +27,7 @@ def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios
         viajes = open('viajes.csv','r',encoding = 'utf-8')
 
         #estacion_destino = estacion
-        linea = "{},{},{},{},{},{},{} \n".format(estaciones[estacion][3],estacion,dni,viajes_actuales[dni][3],duracion_viaje,horario_llegada,id_bici)
+        linea = "{},{},{},{},{},{},{} \n".format(estaciones[estacion][3],estacion,dni,viajes_actuales[dni][3],duracion_viaje,horario_llegada,numero_bicicleta)
         viajes.write(linea)
         viajes.close()
 
