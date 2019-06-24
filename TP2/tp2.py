@@ -143,7 +143,7 @@ def lectura_usuarios():
     cantidad_viajes = 0
     for datos_usuario in lista_usuarios:
         #usuarios[dni] = [nombre,celular,pin,tiempo_de_viaje,cantidad_viajes]
-        usuarios[datos_usuario[2]] = [datos_usuario[0],datos_usuario[1],datos_usuario[3], tiempo_de_viaje,cantidad_viajes]
+        usuarios[int(datos_usuario[2])] = [datos_usuario[0],datos_usuario[1],int(datos_usuario[3]), tiempo_de_viaje,cantidad_viajes]
     return usuarios
 
 def leer_archivo(archivo, vacio):
