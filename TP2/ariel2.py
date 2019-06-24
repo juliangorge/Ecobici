@@ -1,10 +1,10 @@
 from random import randint, random,uniform
 import os
+
 def carga_datos_automatica():
     #Crea 10 estaciones, 5 usuarios, 250 bicis
     #Carga las bicis en las estaciones "a mano"
-    
-    
+
     #Cargo valores a los diccionarios
     estaciones = cargar_estaciones()
     merge_usuarios()
@@ -45,6 +45,7 @@ def cargar_estaciones():
             bicicletas_ancladas = []
         estaciones[i] = [direccion,coordenadas,capacidad,bicicletas_ancladas,cantidad_usos_estacion]
     return estaciones
+
 def cargar_bicicletas(forma_de_uso, estaciones):
     #carga las bicicletas al sistema 
     #si es el primer elemento, id  = 1000 y sino len()+1
@@ -71,6 +72,7 @@ def cargar_bicicletas(forma_de_uso, estaciones):
             bicicletas_en_reparacion.append(numero_bicicleta)
         bicicletas[numero_bicicleta] = [estado, ubicacion]
     return bicicletas,estaciones        
+
 """
 def cargar_usuario():
     #carga los usuarios al sistema
@@ -89,6 +91,7 @@ def cargar_usuario():
         usuarios[dni] = [nombre,celular,pin,tiempo_de_viaje,cantidad_viajes]
     return usuarios
 """
+
 def leer_archivo_usuarios(archivo, vacio):
     linea = archivo.readline() #guarda una cadena de caracteres del archivo
     if linea:
@@ -100,16 +103,16 @@ def leer_archivo_usuarios(archivo, vacio):
         return (vacio)
 
 def merge_usuarios():
-    usuarios1 = open('usuarios1.csv','r',encoding = 'utf-8')
-    usuarios2 = open('usuarios2.csv','r',encoding = 'utf-8')
-    usuarios3 = open('usuarios3.csv','r',encoding = 'utf-8')
-    usuarios4 = open('usuarios4.csv','r',encoding = 'utf-8')
+    usuarios1 = open('Ecobici/usuarios1.csv','r',encoding = 'utf-8')
+    usuarios2 = open('Ecobici/usuarios2.csv','r',encoding = 'utf-8')
+    usuarios3 = open('Ecobici/usuarios3.csv','r',encoding = 'utf-8')
+    usuarios4 = open('Ecobici/usuarios4.csv','r',encoding = 'utf-8')
     nombre1,celular1,dni1,pin1 = leer_archivo_usuarios(usuarios1, [0,0,999999999,0])
     nombre2,celular2,dni2,pin2 = leer_archivo_usuarios(usuarios2,[0,0,999999999,0])
     nombre3,celular3,dni3,pin3 = leer_archivo_usuarios(usuarios3, [0,0,999999999,0])
     nombre4,celular4,dni4,pin4 = leer_archivo_usuarios(usuarios4, [0,0,999999999,0])
 
-    maestro_usuarios = open('maestro_usuarios.csv','w',encoding = 'utf-8')
+    maestro_usuarios = open('Ecobici/maestro_usuarios.csv','w',encoding = 'utf-8')
     while dni1 !=999999999 or dni2 !=999999999 or dni3 !=999999999 or dni4 !=999999999:
         menor = min(int(dni1),int(dni2),int(dni3),int(dni4))
         while menor  == dni1 and dni1 !=0:
@@ -135,7 +138,7 @@ def merge_usuarios():
     maestro_usuarios.close()
 
 def lectura_usuarios():
-    lista_usuarios = recorrer_archivo("maestro_usuarios.csv")
+    lista_usuarios = recorrer_archivo("Ecobici/maestro_usuarios.csv")
     usuarios = {}
     tiempo_de_viaje = 0
     cantidad_viajes = 0
@@ -383,7 +386,6 @@ def simulacion_con_parametro(estaciones,bicicletas,usuarios,usuarios_bloqueados,
 
     estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = simulacion(cantidad_ejecuciones_simulacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
     return (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
-
 
 def informe_cantidad_viajes(usuarios):
     #muestra los 10 usuarios que mas viajes hicieron
@@ -681,9 +683,11 @@ def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas
     elif opcion == '0':
         os.system('clear') #Limpia la terminal
     return (estaciones,usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados)
+
 ##############################
 #####     MAIN CODE      #####
 ##############################
+
 def menu(estaciones, bicicletas,usuarios, usuarios_bloqueados, viajes_actuales, viajes_finalizados, bicicletas_en_reparacion):
     seguir = True
     while seguir == True:
