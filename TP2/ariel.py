@@ -103,18 +103,19 @@ def lectura_bicicletas(estaciones):
     for estacion in estaciones:
         numeros_estaciones.append(estacion)
     for datos_bicicleta in lista_bicicletas:
-        bicicletas[datos_bicicleta[1]] = [estado,ubicacion]
-        
+        numero_bicicleta = int(datos_bicicleta[1])
+        bicicletas[numero_bicicleta] = [estado,ubicacion]
+
         posicion_estacion = randint(0, (len(numeros_estaciones)-1))
         numero_estacion = numeros_estaciones[posicion_estacion]
         while (len(estaciones[numero_estacion][4]) >= 30):
             posicion_estacion = randint(0, (len(numeros_estaciones)-1))
             numero_estacion = numeros_estaciones[posicion_estacion]
-        estaciones[numero_estacion][4].append(datos_bicicleta[1])
+        estaciones[numero_estacion][4].append(numero_bicicleta)
     return bicicletas, estaciones
 
 def lectura_bicicletas2(estaciones):
-    lista_bicicletas = recorrer_archivo("Ecobici/bicicletas.csv")
+    lista_bicicletas = recorrer_archivo('bicicletas.csv')
     bicicletas = {}
     #estado,ubicacion
     estado  = "ok"
@@ -123,16 +124,25 @@ def lectura_bicicletas2(estaciones):
     for estacion in estaciones:
         numeros_estaciones.append(int(estacion))
     longitud_numeros_estaciones = len(numeros_estaciones) - 1
+    cont = 0
     for datos_bicicleta in lista_bicicletas:
         numero_bicicleta = int(datos_bicicleta[1])
         bicicletas[numero_bicicleta] = [estado,ubicacion]
         posicion_estacion = randint(0,longitud_numeros_estaciones)
         numero_estacion = numeros_estaciones[posicion_estacion]
-        if (len(estaciones[numero_estacion][4]) >= 29): #sub4 esta la lista de bicicletas ancladas
+        #print("el contador vale" , cont) 
+        print("el numero de estacion elegido es: ", numero_estacion)
+        # si se cambia la condicion del while por: len(estaciones[numero_estacion][4]) >= 29 and cont < 29 se ve claramente que cada bici se agrega en todas las estaciones
+        while len(estaciones[numero_estacion][4]) >= 29  : #sub4 esta la lista de bicicletas ancladas
+            #con esta condicion se hace infinito porque entra al while infinitamente luego de las primeras 29 bicis
+            print("entre al while porque el numero estacion es invalido")
             posicion_estacion = randint(0,longitud_numeros_estaciones)
             numero_estacion = numeros_estaciones[posicion_estacion]
-        estaciones[numero_estacion][4].append(numero_bicicleta)
-    return bicicletas, estaciones    
+            print("el numero de estacion del while es: ", numero_estacion)
+        estacion[numero_estacion][4].append(numero_bicicleta) #aca es el error
+        print("acabo de agregar la bici ", numero_bicicleta, " a la estacion ", numero_estacion )
+        cont += 1
+    return bicicletas, estaciones       
 
 
 def leer_archivo_usuarios(archivo, vacio):
@@ -192,7 +202,7 @@ def lectura_usuarios():
 def carga_de_datos():
     estaciones =  lectura_estaciones()
     print(estaciones)
-    bicicletas, estaciones = lectura_bicicletas(estaciones)
+    bicicletas, estaciones = lectura_bicicletas2(estaciones)
     
     #merge_usuarios()
     #usuarios = lectura_usuarios()
