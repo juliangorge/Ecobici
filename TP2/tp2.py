@@ -536,8 +536,8 @@ def eliminar_registro_viaje(dni):
     archivo_viajes_actuales = open('Ecobici/TP2/viajes_en_curso.csv', 'w', encoding = 'utf-8')
     for linea in lineas_viajes:
         lista_linea = linea.split(",")
-        if int(lista_linea[0]) == dni:
-            linea= "{},{},{},{}".format(lista_linea[0],lista_linea[1],dni,pin_nuevo)
+        if int(lista_linea[0]) != dni:
+            linea= "{},{},{},{}".format(lista_linea[0],lista_linea[1],lista_linea[2],lista_linea[3])
         archivo_viajes_actuales.write(linea)
     archivo_viajes_actuales.close()
 
