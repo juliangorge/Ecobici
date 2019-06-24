@@ -1,98 +1,50 @@
 from random import randint, random,uniform
 import os
 
-def carga_datos_automatica():
-    #Crea 10 estaciones, 5 usuarios, 250 bicis
-    #Carga las bicis en las estaciones "a mano"
-
-    #Cargo valores a los diccionarios
-    estaciones = cargar_estaciones()
-    merge_usuarios()
-    usuarios = lectura_usuarios()
-    print(usuarios)
-    bicicletas, estaciones = cargar_bicicletas("automatica",estaciones)
-    print("Datos cargados!")
-    return (estaciones,bicicletas,usuarios)
-
-def carga_datos_random():
-    #Crea 10 estaciones, 5 usuarios, 250 bicis
-    #Distribuye y crea 250 bicis aleatoriamente en estaciones
-    
-    #Carga valores a los diccionarios1
-    estaciones = cargar_estaciones()
-    merge_usuarios()
-    usuarios = lectura_usuarios()
-    print(usuarios)
-    bicicletas, estaciones = cargar_bicicletas("aleatoria",estaciones)
-    print("Datos cargados aleatoriamente!")
-    return (estaciones,bicicletas,usuarios)
-
-def cargar_estaciones():
-    #carga las estaciones
+def lectura_estaciones():
+    lista_estaciones = recorrer_archivo(r'C:\Users\aaa\Desktop\TP2prueba\estaciones.csv')
     estaciones = {}
-    numero_direccion = 100
-    direccion = "Av. Rivadavia {} ".format(numero_direccion)
-    latitud = -34.6038
-    longitud = -58.3816
-    coordenadas = (" {} , {}". format(latitud,(longitud)))
-    capacidad = 30
-    bicicletas_ancladas = []
-    cantidad_usos_estacion = 0
-    for i in range(1,11):
-        if i != 1:
-            numero_direccion+= 100
-            direccion = "Av. Rivadavia {} ".format(numero_direccion ) #suma 100mts a la anterior direccion
-            #20 segundos = 100mts
-            coordenadas = (" {} / {}". format(latitud,(longitud+0.0020)))
-            bicicletas_ancladas = []
-        estaciones[i] = [direccion,coordenadas,capacidad,bicicletas_ancladas,cantidad_usos_estacion]
+    
+    for datos_estacion in lista_estaciones:
+        cantidad_usos_estacion = 0
+        #longitud,latitud,direccion,capacidad, bicicletas_ancladas, cantidad_usos
+        estaciones[int(datos_estacion[3])] = [datos_estacion[0],datos_estacion[1],datos_estacion[2],datos_estacion[4], [],cantidad_usos_estacion]
     return estaciones
 
-def cargar_bicicletas(forma_de_uso, estaciones):
-    #carga las bicicletas al sistema 
-    #si es el primer elemento, id  = 1000 y sino len()+1
+def lectura_bicicletas(estaciones):
+    lista_bicicletas = recorrer_archivo(r'C:\Users\aaa\Desktop\TP2prueba\bicicletas.csv')
     bicicletas = {}
-    numero_estaciones = 1
-    for numero_bicicleta in range(1000,1251):
-        if numero_bicicleta < 1241:
-            estado = "ok"
-            ubicacion = "anclada"
-            if forma_de_uso == "aleatoria":
-                numero_estacion = randint(1,10)
-                if(len(estaciones[numero_estacion][3]) < 30):
-                    estaciones[numero_estacion][3].append(numero_bicicleta)
-            else:    
-                if len(estaciones[numero_estaciones][3]) < 25:
-                    estaciones[numero_estaciones][3].append(numero_bicicleta)
-                else:
-                    numero_estaciones += 1
-                    estaciones[numero_estaciones][3].append(numero_bicicleta)
-                    #print(estaciones[numero_estaciones])
-        else:
-            estado = "reparacion"
-            ubicacion = "reparacion"
-            bicicletas_en_reparacion.append(numero_bicicleta)
-        bicicletas[numero_bicicleta] = [estado, ubicacion]
-    return bicicletas,estaciones        
+    #estado,ubicacion
+    estado  = "ok"
+    ubicacion = "anclada"
+    numeros_estaciones =[]
+    for estacion in estaciones:
+        numeros_estaciones.append(int(estacion))
+    longitud_numeros_estaciones = len(numeros_estaciones) - 1
+    for datos_bicicleta in lista_bicicletas:
+        numero_bicicleta = int(datos_bicicleta[1])
+        bicicletas[numero_bicicleta] = [estado,ubicacion]
+        posicion_estacion = randint(0,longitud_numeros_estaciones)
+        numero_estacion = numeros_estaciones[posicion_estacion]
+        while len(estaciones[numero_estacion][4]) >= 29:
+            posicion_estacion = randint(0,longitud_numeros_estaciones)
+            numero_estacion = numeros_estaciones[posicion_estacion]
+        estaciones[numero_estacion][4].append(numero_bicicleta) 
+    return bicicletas, estaciones    
 
-"""
-def cargar_usuario():
-    #carga los usuarios al sistema
-    usuarios = {}
-    pre_nombres = ['Uriel Kelman','Julieta Ponti','Julián Gorge','Ariel Pisterman','Franco Cuppari']
-    pre_celular = ['03034568','03034569','12345678','87654321','13578642']
-    tiempo_de_viaje = 0
-    dni = 9999999
-    pin = 1000
-    cantidad_viajes = 0
-    for i in range(5):
-        nombre = pre_nombres[i]
-        celular = pre_celular[i]
-        dni += 1
-        pin += 10
-        usuarios[dni] = [nombre,celular,pin,tiempo_de_viaje,cantidad_viajes]
-    return usuarios
-"""
+def carga_datos_automatica():
+    estaciones =  lectura_estaciones()
+    print ("ya cargue estaciones ")
+    print(estaciones)
+    bicicletas, estaciones = lectura_bicicletas (estaciones)
+    print("termine lectura bicis")
+    print(estaciones)
+    merge_usuarios()
+    usuarios = lectura_usuarios()
+    #al sacar el comentario del print de abajo imprime cada estacion con 3000 bicicletas ancladas cuando la condicion del while no permite la iteracion infinita (cuando se la cambia por lo comentado)
+    #print(estaciones)
+    
+    return estaciones, bicicletas,usuarios
 
 def leer_archivo_usuarios(archivo, vacio):
     linea = archivo.readline() #guarda una cadena de caracteres del archivo
@@ -586,26 +538,7 @@ def validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_b
         print('No tienes ninguna bicicleta para devolver!')
     return estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados
 
-def carga_de_datos_menu(estaciones,bicicletas,usuarios):
-    print('1 - Carga automática')
-    print('2 - Carga automática aleatoria')
-    print('0 - Salir')
-    opcion = input('Elige una opción para continuar: ')
-            
-    while opcion not in ['1','2','0']:
-        print('La opción es incorrecta.\n')
-        opcion = input('Elige una opción para continuar: ')
-    if opcion == '1':
-        estaciones,bicicletas,usuarios = carga_datos_automatica()
-        os.system('clear') ##Limpia la terminal 
-        print('Datos cargados!\n')
-    elif opcion == '2':
-        estaciones,bicicletas,usuarios = carga_datos_random()   
-        os.system('clear') ##Limpia la terminal
-        print('Datos aleatorios cargados!\n')
-    elif opcion == '0':
-        os.system('clear') #Limpia la terminal
-    return (estaciones,bicicletas,usuarios)
+
 
 def usuarios_menu (usuarios,usuarios_bloqueados):
     print('1 - Listado')
@@ -671,6 +604,7 @@ def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas
     print('1 - Modificar PIN')
     print('2 - Retirar Bicicleta')
     print('3 - Devolver bicicletas')
+    print('4 - Robar bicicleta')
     print('0 - Salir')
     opcion = input('Elige una opción para continuar: ')
     while opcion not in ['1','2','3','0']:
@@ -705,7 +639,7 @@ def menu(estaciones, bicicletas,usuarios, usuarios_bloqueados, viajes_actuales, 
         if opcion == '0':
             seguir = False
         elif opcion == '1':
-            estaciones,bicicletas,usuarios = carga_de_datos_menu(estaciones, bicicletas, usuarios)
+            estaciones,bicicletas,usuarios = carga_datos_automatica()
         elif opcion == '2':
            usuarios,usuarios_bloqueados = usuarios_menu(usuarios,usuarios_bloqueados)
         elif opcion == '3':
