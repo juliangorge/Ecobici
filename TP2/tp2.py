@@ -72,7 +72,6 @@ def cargar_bicicletas(forma_de_uso, estaciones):
             bicicletas_en_reparacion.append(numero_bicicleta)
         bicicletas[numero_bicicleta] = [estado, ubicacion]
     return bicicletas,estaciones        
-
 """
 def cargar_usuario():
     #carga los usuarios al sistema
@@ -103,16 +102,16 @@ def leer_archivo_usuarios(archivo, vacio):
         return (vacio)
 
 def merge_usuarios():
-    usuarios1 = open('Ecobici/usuarios1.csv','r',encoding = 'utf-8')
-    usuarios2 = open('Ecobici/usuarios2.csv','r',encoding = 'utf-8')
-    usuarios3 = open('Ecobici/usuarios3.csv','r',encoding = 'utf-8')
-    usuarios4 = open('Ecobici/usuarios4.csv','r',encoding = 'utf-8')
+    usuarios1 = open('Ecobici/TP2/usuarios1.csv','r',encoding = 'utf-8')
+    usuarios2 = open('Ecobici/TP2/usuarios2.csv','r',encoding = 'utf-8')
+    usuarios3 = open('Ecobici/TP2/usuarios3.csv','r',encoding = 'utf-8')
+    usuarios4 = open('Ecobici/TP2/usuarios4.csv','r',encoding = 'utf-8')
     nombre1,celular1,dni1,pin1 = leer_archivo_usuarios(usuarios1, [0,0,999999999,0])
     nombre2,celular2,dni2,pin2 = leer_archivo_usuarios(usuarios2,[0,0,999999999,0])
     nombre3,celular3,dni3,pin3 = leer_archivo_usuarios(usuarios3, [0,0,999999999,0])
     nombre4,celular4,dni4,pin4 = leer_archivo_usuarios(usuarios4, [0,0,999999999,0])
 
-    maestro_usuarios = open('Ecobici/maestro_usuarios.csv','w',encoding = 'utf-8')
+    maestro_usuarios = open('Ecobici/TP2/maestro_usuarios.csv','w',encoding = 'utf-8')
     while dni1 !=999999999 or dni2 !=999999999 or dni3 !=999999999 or dni4 !=999999999:
         menor = min(int(dni1),int(dni2),int(dni3),int(dni4))
         while menor  == dni1 and dni1 !=0:
@@ -138,13 +137,13 @@ def merge_usuarios():
     maestro_usuarios.close()
 
 def lectura_usuarios():
-    lista_usuarios = recorrer_archivo("Ecobici/maestro_usuarios.csv")
+    lista_usuarios = recorrer_archivo("Ecobici/TP2/maestro_usuarios.csv")
     usuarios = {}
     tiempo_de_viaje = 0
     cantidad_viajes = 0
     for datos_usuario in lista_usuarios:
         #usuarios[dni] = [nombre,celular,pin,tiempo_de_viaje,cantidad_viajes]
-        usuarios[datos_usuario[2]] = [datos_usuario[0],datos_usuario[1],datos_usuario[3], tiempo_de_viaje,cantidad_viajes]
+        usuarios[int(datos_usuario[2])] = [datos_usuario[0],datos_usuario[1],int(datos_usuario[3]), tiempo_de_viaje,cantidad_viajes]
     return usuarios
 
 def leer_archivo(archivo, vacio):
@@ -195,11 +194,11 @@ def alta_usuario(usuarios):
     return(usuarios)   
 
 def subir_usuario(linea_usuario_nuevo):
-    maestro_usuarios1 = open('maestro_usuarios.csv','r',encoding = 'utf-8')
+    maestro_usuarios1 = open('Ecobici/TP2/maestro_usuarios.csv','r',encoding = 'utf-8')
     datos_usuarios = maestro_usuarios1.readlines()
     print(datos_usuarios)
     maestro_usuarios1.close()
-    maestro_usuarios2 = open('maestro_usuarios.csv','w',encoding = 'utf-8')
+    maestro_usuarios2 = open('Ecobici/TP2/maestro_usuarios.csv','w',encoding = 'utf-8')
     for usuario in range(0, len(datos_usuarios) + 1):
         if usuario == len(datos_usuarios):
             maestro_usuarios2.write(linea_usuario_nuevo)
@@ -264,10 +263,10 @@ def modificar_pin(usuarios,usuarios_bloqueados):
     return (usuarios,usuarios_bloqueados)
 
 def cambiar_pin_archivo(dni,pin_nuevo):
-    archivo_usuarios = open('maestro_usuarios.csv', 'r', encoding = 'utf-8')
+    archivo_usuarios = open('Ecobici/TP2/maestro_usuarios.csv', 'r', encoding = 'utf-8')
     lineas_usuario = archivo_usuarios.readlines()
     archivo_usuarios.close()
-    archivo_usuarios = open('maestro_usuarios.csv', 'w', encoding = 'utf-8')
+    archivo_usuarios = open('Ecobici/TP2/maestro_usuarios.csv', 'w', encoding = 'utf-8')
     for linea in lineas_usuario:
         lista_linea = linea.split(",")
         if int(lista_linea[2]) == dni:
@@ -349,10 +348,10 @@ def retirar_bicicleta(forma_de_uso, dni, estaciones, bicicletas, usuarios, viaje
     return (estacion,estaciones, bicicletas, usuarios, viajes_actuales)
 
 def persistir_retiro_bicicleta(linea_viaje_nuevo):
-    archivo_viajes = open('viajes_en_curso.csv', 'r', encoding = 'utf-8')
+    archivo_viajes = open('Ecobici/TP2/viajes_en_curso.csv', 'r', encoding = 'utf-8')
     datos_viajes = archivo_viajes.readlines()
     archivo_viajes.close()
-    archivo_viajes = open('viajes_en_curso.csv', 'w', encoding = 'utf-8')
+    archivo_viajes = open('Ecobici/TP2/viajes_en_curso.csv', 'w', encoding = 'utf-8')
     for viaje in range(0, len(datos_viajes) + 1):
         if viaje == len(datos_viajes):
             archivo_viajes.write(linea_viaje_nuevo)
@@ -531,10 +530,10 @@ def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios
     return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)  
 
 def eliminar_registro_viaje(dni):
-    archivo_viajes_actuales = open('viajes_en_curso.csv', 'r', encoding = 'utf-8')
+    archivo_viajes_actuales = open('Ecobici/TP2/viajes_en_curso.csv', 'r', encoding = 'utf-8')
     lineas_viajes = archivo_viajes_actuales.readlines()
     archivo_viajes_actuales.close()
-    archivo_viajes_actuales = open('viajes_en_curso.csv', 'w', encoding = 'utf-8')
+    archivo_viajes_actuales = open('Ecobici/TP2/viajes_en_curso.csv', 'w', encoding = 'utf-8')
     for linea in lineas_viajes:
         lista_linea = linea.split(",")
         if int(lista_linea[0]) == dni:
@@ -583,6 +582,53 @@ def validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_b
     else:    
         print('No tienes ninguna bicicleta para devolver!')
     return estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados
+
+def robar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados):
+    #Retira una bicicleta del diccionario estaciones y la pone en circulacion (viajes actuales), verificando que el usuario no esté bloqueado
+    usuarios,dni = validar_bloqueo(usuarios,usuarios_bloqueados)
+    if dni in viajes_actuales:
+        print('Usted ya tiene una bicicleta!')
+    else:
+        if(dni not in usuarios_bloqueados):
+            estado, dni_ladron, nombre_ladron = retirar_bicicleta_robando(dni, estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
+
+            if(dni == dni_ladron):
+                if(estado == 'bloqueado'):
+                    print('El usuario {} fue bloqueado por intento de robo'.format(nombre_ladron))
+                else:
+                    print('El usuario {} ha robado una bicicleta!'.format(nombre_ladron))
+        else:
+            print("Usted esta bloqueado, no puede retirar una bicicleta.")
+    return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
+
+def retirar_bicicleta_robando(dni, estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados):
+    bicicleta = input('Seleccione número de bicicleta: ')
+    claves = bicicletas.keys()
+    while not int(bicicleta) in claves or not bicicleta.isdigit():
+        bicicleta = input('Seleccione un número de bicicleta correcto: ')
+    bicicleta = int(bicicleta)
+
+    #Revisar si bicicleta está en viajes actuales, sino bloquear
+    bloquear = True
+    for datos in viajes_actuales.values():
+        if(datos[0] == bicicleta):
+            bloquear = False
+
+            #Obtengo DNI del asaltado
+            usuario_asaltado = [dni for dni, datos_ in viajes_actuales.items() if datos_[0] == bicicleta]
+
+            #Elimino el viaje actual del asaltado, generando uno identico pero con el DNI del ladron
+            del viajes_actuales[usuario_asaltado[0]]
+            viajes_actuales[dni] = [ bicicleta, datos[1], datos[2] ]
+
+    for dni_, usuario in usuarios.items():
+        if dni == dni_:
+            if(bloquear):
+                bloquear_usuario(dni,usuarios,usuarios_bloqueados)
+                return 'bloqueado', dni_, usuarios[dni][0]
+            else:
+                return 'robo', dni_, usuarios[dni][0]
+
 
 def carga_de_datos_menu(estaciones,bicicletas,usuarios):
     print('1 - Carga automática')
@@ -669,9 +715,10 @@ def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas
     print('1 - Modificar PIN')
     print('2 - Retirar Bicicleta')
     print('3 - Devolver bicicletas')
+    print('4 - ROBAR bicicletas')
     print('0 - Salir')
     opcion = input('Elige una opción para continuar: ')
-    while opcion not in ['1','2','3','0']:
+    while opcion not in ['1','2','3','4','0']:
         print('La opción es incorrecta.\n')
         opcion = input('Elige una opción para continuar: ')
     if opcion == '1':
@@ -680,6 +727,8 @@ def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas
         estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados = retirar_bicicleta_ingreso(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
     elif opcion == '3':
         estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+    elif opcion == '4':
+        estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados = robar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
     elif opcion == '0':
         os.system('clear') #Limpia la terminal
     return (estaciones,usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados)
