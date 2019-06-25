@@ -1,34 +1,19 @@
 from random import randint, random,uniform
 import os
 import pickle
-def devolver_bicicletas_inicio(bicicletas, viajes_actuales):
-    
-    with open("viajes_en_curso.pkl","rb") as archivo: 
+def devolver_bicicletas_inicio(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
+    with open("TP2\viajes_en_curso.pkl","rb") as archivo: 
         seguir = True
         while seguir: 
             try:
-                data = pickle.load(archivo)
-                print(data)
+                data = pickle.load(archivo)    
             except EOFError:
                 seguir = False
-           
-
-
-    for dni,datos in viajes_en_curso.items():
-        #Buscar estacion con capacidad para dejar bicicletas
-        #Viajes debería tener el dato de que el usuario dejó la bicicleta?
-        #archivo binario y persist
-
-        for estacion_id, estacion in estaciones.items():
-            maximo_anclajes = 30
-            if(len(estacion[3]) <= maximo_anclajes):
-                estacion[3].append(datos[0])
-                #eliminar del archivo
-                viajes_en_curso_temp[dni] = [datos[0],datos[1],datos[2],datos[3]]
-    
-    #Asumiendo que se terminan TODOS los "viajes_en_curso" anteriores, elimino todos los items del archivo y el array sin excepcion
-    viajes_en_curso = viajes_en_curso_temp
-    return viajes_en_curso
+    bicicletas_devueltas = []
+    for viaje in data:
+        devolver_bicicleta("simulacion", viaje, data[viaje][1], estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+        bicicletas_devueltas.append(data[viaje[0])
+    return estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados, bicicletas_devueltas
 def lectura_estaciones():
     lista_estaciones = recorrer_archivo(r'TP2\estaciones.csv')
     estaciones = {}
@@ -50,6 +35,7 @@ def lectura_bicicletas(estaciones):
         numeros_estaciones.append(int(estacion))
     longitud_numeros_estaciones = len(numeros_estaciones) - 1
     for datos_bicicleta in lista_bicicletas:
+        if 
         numero_bicicleta = int(datos_bicicleta[1])
         bicicletas[numero_bicicleta] = [estado,ubicacion]
         posicion_estacion = randint(0,longitud_numeros_estaciones)
@@ -61,6 +47,7 @@ def lectura_bicicletas(estaciones):
     return bicicletas, estaciones    
 
 def carga_datos_automatica():
+    
     estaciones =  lectura_estaciones()
     bicicletas, estaciones = lectura_bicicletas (estaciones)
     print("datos cargados!")
@@ -480,6 +467,8 @@ def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios
             bicicletas[numero_bicicleta][1] = "anclada"
 
         horario_llegada = generar_horario_llegada(dni, viajes_actuales, duracion_viaje)
+        estacion_origen = viajes_actuales[dni][2]
+        hora_salida = viajes_actuales[dni][3]
         del viajes_actuales[dni] #borra el viaje actual
         usuarios[dni][3] += duracion_viaje
         usuarios[dni][4] += 1
