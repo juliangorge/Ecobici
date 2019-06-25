@@ -146,6 +146,17 @@ def lectura_usuarios():
         usuarios[int(datos_usuario[2])] = [datos_usuario[0],datos_usuario[1],int(datos_usuario[3]), tiempo_de_viaje,cantidad_viajes]
     return usuarios
 
+def lectura_viajes_en_curso():
+    lista_viajes = recorrer_archivo("Ecobici/TP2/viajes_en_curso.csv")
+    viajes = {}
+    
+    for datos_viaje in lista_viajes:
+        #cantidad_usos_estacion = 0
+        #longitud,latitud,direccion,capacidad, bicicletas_ancladas, cantidad_usos
+        viajes[int(datos_viaje[0])] = [datos_viaje[1],datos_viaje[2],datos_viaje[3],datos_viaje[4],datos_viaje[5],datos_viaje[6]]
+    return viajes
+
+
 def leer_archivo(archivo, vacio):
     linea = archivo.readline() #guarda una cadena de caracteres del archivo
     if linea:
@@ -733,6 +744,30 @@ def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas
         os.system('clear') #Limpia la terminal
     return (estaciones,usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados)
 
+def devolver_bicicletas_inicio(bicicletas, viajes_actuales):
+    #
+    estaciones = cargar_estaciones()
+    viajes_en_curso = lectura_viajes_en_curso()
+    viajes_en_curso_temp = {}
+
+    for dni,datos in viajes_en_curso.items():
+        #Buscar estacion con capacidad para dejar bicicletas
+        #Viajes debería tener el dato de que el usuario dejó la bicicleta?
+        #archivo binario y persist
+
+        for estacion_id, estacion in estaciones.items():
+            maximo_anclajes = 30
+            if(len(estacion[3]) <= maximo_anclajes):
+                estacion[3].append(datos[0])
+                #eliminar del archivo
+                viajes_en_curso_temp[dni] = [datos[0],datos[1],datos[2],datos[3]]
+    
+    #Asumiendo que se terminan TODOS los "viajes_en_curso" anteriores, elimino todos los items del archivo y el array sin excepcion
+    viajes_en_curso = viajes_en_curso_temp
+    return viajes_en_curso
+
+
+
 ##############################
 #####     MAIN CODE      #####
 ##############################
@@ -776,4 +811,6 @@ viajes_finalizados = {}
 bicicletas_en_reparacion = []
 ### Arranco programa
 os.system('clear') ##Limpia la terminal
+
+devolver_bicicletas_inicio(bicicletas, viajes_actuales) #devuelvo bicicletas en uso de la sesion anterior
 menu(estaciones, bicicletas,usuarios, usuarios_bloqueados, viajes_actuales, viajes_finalizados, bicicletas_en_reparacion)
