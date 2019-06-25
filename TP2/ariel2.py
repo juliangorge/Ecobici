@@ -294,19 +294,7 @@ def retirar_bicicleta(forma_de_uso, dni, estaciones, bicicletas, usuarios, viaje
     print ("No hay bicicletas disponibles, intente en otra estación")
     return (estacion,estaciones, bicicletas, usuarios, viajes_actuales)
 
-def persistir_retiro_bicicleta(linea_viaje_nuevo):
-    archivo_viajes = open(r'TP2\viajes_en_curso.csv', 'r', encoding = 'utf-8')
-    datos_viajes = archivo_viajes.readlines()
-    archivo_viajes.close()
-    archivo_viajes = open(r'TP2\viajes_en_curso.csv', 'w', encoding = 'utf-8')
-    for viaje in range(0, len(datos_viajes) + 1):
-        if viaje == len(datos_viajes):
-            archivo_viajes.write(linea_viaje_nuevo)
-        else:
-            datos_linea = datos_viajes[viaje].split(",") 
-            linea_usuario_viejo = "{},{},{},{}".format(datos_linea[0],datos_linea[1],datos_linea[2],datos_linea[3])
-            archivo_viajes.write(linea_usuario_viejo)
-    archivo_viajes.close()
+
     
 def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
     #Simula retiro y devolución de una bicicleta
@@ -594,7 +582,9 @@ def retirar_bicicleta_robando(dni, estaciones, bicicletas, usuarios, viajes_actu
             viajes_actuales[dni] = [ bicicleta, datos[1], datos[2] ]
             eliminar_registro_viaje(usuario_asaltado[0])
             linea_viaje_nuevo =  "{},{},{},{}".format(dni, bicicleta,datos[1],datos[2])
-            persistir_retiro_bicicleta(linea_viaje_nuevo)
+            archivo_viajes = open(r'TP2\viajes_en_curso.csv', 'a', encoding = 'utf-8')
+            archivo_viajes.write(linea_viaje_nuevo) 
+            archivo_viajes.close()
 
     for dni_, usuario in usuarios.items():
         if dni == dni_:
