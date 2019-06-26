@@ -4,24 +4,27 @@ import pickle
 from haversine import haversine, Unit
 def devolver_bicicletas_inicio(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
     data = []
+    bicicletas_devueltas = []
     with open(r"TP2\viajes_en_curso.pkl","rb") as archivo: 
         seguir = True
         while seguir: 
             try:
-                data = pickle.load(archivo)    
+                data = pickle.load(archivo) 
+                viaje = data.split(",")
+                #viajes_actuales[dni] = [numbici, estacion, hora salida]
+                viajes_actuales[int(viaje[0])] = [int(viaje[1]),int(viaje[2]),viaje[3]]
+                numeros_estaciones =[]
+                for estacion in estaciones:
+                    numeros_estaciones.append(int(estacion))
+                longitud_numeros_estaciones = len(numeros_estaciones) - 1
+                posicion_estacion = randint(0,longitud_numeros_estaciones)
+                numero_estacion = numeros_estaciones[posicion_estacion]
+                devolver_bicicleta("simulacion", int(viaje[0]), numero_estacion, estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)   
+                bicicletas_devueltas.append(viaje[0])
+                
             except EOFError:
                 seguir = False
-                
-    print(data)            
-    bicicletas_devueltas = []
-    
-    for viaje in data:
-        print(viaje)
-        viajes_actuales[int(viaje[0])] = [int(viaje[1]),int(viaje[2]),viaje[3]]
-        print(viajes_actuales)
-        devolver_bicicleta("simulacion", int(viaje[0]), int(viaje[1]), estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
-        bicicletas_devueltas.append(viaje[0])
-    
+                           
     return estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados, bicicletas_devueltas
     
 def lectura_estaciones():
@@ -29,9 +32,9 @@ def lectura_estaciones():
     estaciones = {}
     
     for datos_estacion in lista_estaciones:
-        cantidad_usos_estacion = 0
+        
         #longitud,latitud,direccion,capacidad, bicicletas_ancladas, cantidad_usos
-        estaciones[int(datos_estacion[3])] = [datos_estacion[0],datos_estacion[1],datos_estacion[2],datos_estacion[4], [],cantidad_usos_estacion]
+        estaciones[int(datos_estacion[3])] = [datos_estacion[0],datos_estacion[1],datos_estacion[2],int(datos_estacion[4]), []]
     return estaciones
 
 def lectura_bicicletas(estaciones):
@@ -64,16 +67,17 @@ def carga_datos_automatica(estaciones, bicicletas,usuarios,usuarios_bloqueados,v
     
     estaciones =  lectura_estaciones()
     bicicletas, estaciones = lectura_bicicletas (estaciones)
-    print("datos cargados!")
-    estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados, bicicletas_devueltas= devolver_bicicletas_inicio(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+    
+    
+    usuarios_bloqueados = []
     try:
         usuarios, usuarios_bloqueados = lectura_usuarios(usuarios_bloqueados)
     except FileNotFoundError:
         merge_usuarios()
         usuarios, usuarios_bloqueados = lectura_usuarios(usuarios_bloqueados)
-
+    estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados, bicicletas_devueltas= devolver_bicicletas_inicio(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
     bicicletas, estaciones= anclar_bicicletas(bicicletas, estaciones, bicicletas_devueltas)
-    
+    print("datos cargados!")
     return estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados
 
 def leer_archivo_usuarios(archivo, vacio):
@@ -329,10 +333,10 @@ def retirar_bicicleta(forma_de_uso, dni, estaciones, bicicletas, usuarios, viaje
     numero_bicicleta, numero_anclaje = elegir_anclaje_de_estacion(estacion, estaciones, bicicletas)
     while numero_bicicleta != -1:
         bicicletas[numero_bicicleta][1] = "En circulación"
-        estaciones[estacion][3].remove(numero_bicicleta)
+        estaciones[estacion][4].remove(numero_bicicleta)
         horario_salida = generar_horario_salida()
         viajes_actuales[dni] = [numero_bicicleta, estacion, horario_salida,0]
-        estaciones[estacion][4] += 1
+
         if forma_de_uso == "manual":
             print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje+1))
         else:
@@ -493,7 +497,12 @@ def elegir_estacion(forma_a_utilizar, estaciones):
             estacion = input('Seleccione un número de estación correcto: ')
         estacion = int(estacion)
     else:
-        estacion = randint(1,10)
+        numeros_estaciones =[]
+        for estacion in estaciones:
+            numeros_estaciones.append(int(estacion))
+        longitud_numeros_estaciones = len(numeros_estaciones) - 1
+        posicion_estacion = randint(0,longitud_numeros_estaciones)
+        estacion = numeros_estaciones[posicion_estacion]
     return estacion
 
 def elegir_anclaje_de_estacion(estacion, estaciones, bicicletas):
@@ -520,9 +529,9 @@ def generar_horario_salida():
     else:
         minuto = randint(0,59)
     if minuto <10: #agrega el 0 a los minutos si son menores a 10
-        horario_salida = str(hora) + ':0' + str(minuto) + str(segundos)
+        horario_salida = str(hora) + ':0' + str(minuto) + ':' + str(segundos)
     else:
-        horario_salida = str(hora) + ':' + str(minuto) + str(segundos)
+        horario_salida = str(hora) + ':' + str(minuto) + ':' + str(segundos)
     return(horario_salida)
 
 def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
@@ -539,19 +548,19 @@ def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios
             bicicletas[numero_bicicleta][1] = "anclada"
 
         horario_llegada = generar_horario_llegada(dni, viajes_actuales, duracion_viaje)
-        estacion_origen = viajes_actuales[dni][2]
-        hora_salida = viajes_actuales[dni][3]
+        estacion_origen = viajes_actuales[dni][1]
+        hora_salida = viajes_actuales[dni][2]
         del viajes_actuales[dni] #borra el viaje actual
         
         estaciones[estacion][4].append(numero_bicicleta)
         viajes_finalizados[dni] = [numero_bicicleta, horario_llegada, estacion]
-        estaciones[estacion][5] += 1 
-        ubicacion_salida=(estaciones[estacion_origen][0],estaciones[estacion_origen][1])
-        ubicacion_llegada=(estaciones[estacion][0],estaciones[estacion][1])
+        #estaciones[estacion][5] += 1 
+        ubicacion_salida=(float(estaciones[estacion_origen][0]),float(estaciones[estacion_origen][1]))
+        ubicacion_llegada=(float(estaciones[estacion][0]),float(estaciones[estacion][1]))
         distancia_recorrida = haversine(ubicacion_salida, ubicacion_llegada,unit = Unit.KILOMETERS)
         if duracion_viaje > 60:
             print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}. Al exceder los 60 minutos de uso ha sido bloqueado.\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][2],horario_llegada))
-            print("la distancia recorrida fue de: {} kms.".format(distancia_recorrida))
+            print("La distancia recorrida fue de: {} kms.".format(distancia_recorrida))
         else:
             print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}.\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_llegada))
             print("la distancia recorrida fue de: {} kms.".format(distancia_recorrida))
@@ -585,9 +594,9 @@ def generar_horario_llegada(dni, viajes_actuales, duracion_viaje):
         minuto += duracion_viaje
     #agrega el 0 a los minutos si son menores a 10
     if minuto <10:
-        horario_llegada = str(hora) + ':0' + str(minuto) +str(segundos)
+        horario_llegada = str(hora) + ':0' + str(minuto) + ':' + str(segundos)
     else:
-        horario_llegada = str(hora) + ':' + str(minuto) + str(segundos)
+        horario_llegada = str(hora) + ':' + str(minuto) + ':'  + str(segundos)
     return (horario_llegada)
 
 def estado_bicicleta_devolucion(numero_bicicleta,bicicletas):
@@ -673,11 +682,12 @@ def informe_viajes_robados ():
         print("la bicicleta {}, fue robada a {} por {} ").format(datos_viaje[0], datos_viaje[1], datos_viaje[2])
     
 def guardar_viajes_en_curso(viajes_actuales):
-    with open("viajes_en_curso.pkl","wb") as archivo:
+    with open(r"TP2\viajes_en_curso.pkl","wb") as archivo:
         pkl= pickle.Pickler(archivo) #declaro que archivo usara el pkl
         for viaje in viajes_actuales:
-            linea_viaje = "{},{},{},{}".format(viaje,viajes_actuales[viaje][0],viajes_actuales[viaje][1],viajes_actuales[viaje][2])
-            pkl.dump(linea_viaje) #convierte la info a binario y lo sube al archivo
+            print(viaje)
+            linea_viajes = "{},{},{},{}".format(viaje,viajes_actuales[viaje][0],viajes_actuales[viaje][1],viajes_actuales[viaje][2])
+            pkl.dump(linea_viajes) #convierte la info a binario y lo sube al archivo
 
 def usuarios_menu (usuarios,usuarios_bloqueados):
     print('1 - Listado')
