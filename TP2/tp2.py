@@ -149,11 +149,11 @@ def lectura_usuarios():
 def lectura_viajes_en_curso():
     lista_viajes = recorrer_archivo("Ecobici/TP2/viajes_en_curso.csv")
     viajes = {}
-    
+
     for datos_viaje in lista_viajes:
-        #cantidad_usos_estacion = 0
         #longitud,latitud,direccion,capacidad, bicicletas_ancladas, cantidad_usos
-        viajes[int(datos_viaje[0])] = [datos_viaje[1],datos_viaje[2],datos_viaje[3],datos_viaje[4],datos_viaje[5],datos_viaje[6]]
+        viajes[int(datos_viaje[0])] = [datos_viaje[1],datos_viaje[2],datos_viaje[3]]
+        #viajes[int(datos_viaje[0])] = [datos_viaje[1],datos_viaje[2],datos_viaje[3],datos_viaje[4],datos_viaje[5],datos_viaje[6]]
     return viajes
 
 
@@ -207,7 +207,7 @@ def alta_usuario(usuarios):
 def subir_usuario(linea_usuario_nuevo):
     maestro_usuarios1 = open('Ecobici/TP2/maestro_usuarios.csv','r',encoding = 'utf-8')
     datos_usuarios = maestro_usuarios1.readlines()
-    print(datos_usuarios)
+    #print(datos_usuarios)
     maestro_usuarios1.close()
     maestro_usuarios2 = open('Ecobici/TP2/maestro_usuarios.csv','w',encoding = 'utf-8')
     for usuario in range(0, len(datos_usuarios) + 1):
@@ -348,6 +348,8 @@ def retirar_bicicleta(forma_de_uso, dni, estaciones, bicicletas, usuarios, viaje
         viajes_actuales[dni] = [numero_bicicleta, estacion, horario_salida]
         estaciones[estacion][4] += 1
         if forma_de_uso == "manual":
+            ####
+            lectura_viajes_en_curso()
             print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje+1))
         else:
            
@@ -368,7 +370,7 @@ def persistir_retiro_bicicleta(linea_viaje_nuevo):
             archivo_viajes.write(linea_viaje_nuevo)
         else:
             datos_linea = datos_viajes[viaje].split(",") 
-            linea_usuario_viejo = "{},{},{},{}".format(datos_linea[0],datos_linea[1],datos_linea[2],datos_linea[3])
+            linea_usuario_viejo = "{},{},{},{}\n".format(datos_linea[0],datos_linea[1],datos_linea[2],datos_linea[3])
             archivo_viajes.write(linea_usuario_viejo)
     archivo_viajes.close()
     
@@ -638,8 +640,20 @@ def retirar_bicicleta_robando(dni, estaciones, bicicletas, usuarios, viajes_actu
                 bloquear_usuario(dni,usuarios,usuarios_bloqueados)
                 return 'bloqueado', dni_, usuarios[dni][0]
             else:
+                guardar_bicicletas_robadas(dni, bicicleta)
                 return 'robo', dni_, usuarios[dni][0]
 
+def guardar_bicicletas_robadas(dni, bicicleta):
+    bicicletas_robadas = open('Ecobici/TP2/bicicletas_robadas.csv', 'r', encoding = 'utf-8')
+    lineas_bicicletas_robadas = bicicletas_robadas.readlines()
+    bicicletas_robadas.close()
+    bicicletas_robadas = open('Ecobici/TP2/bicicletas_robadas.csv', 'w', encoding = 'utf-8')
+    for linea in lineas_bicicletas_robadas:
+        lista_linea = linea.split(",")
+        if int(lista_linea[0]) != dni:
+            linea= "{},{}".format(lista_linea[0],lista_linea[1])
+        bicicletas_robadas.write(linea)
+    bicicletas_robadas.close()
 
 def carga_de_datos_menu(estaciones,bicicletas,usuarios):
     print('1 - Carga automática')
@@ -745,26 +759,23 @@ def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas
     return (estaciones,usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados)
 
 def devolver_bicicletas_inicio(bicicletas, viajes_actuales):
-    #
     estaciones = cargar_estaciones()
     viajes_en_curso = lectura_viajes_en_curso()
     viajes_en_curso_temp = {}
 
     for dni,datos in viajes_en_curso.items():
-        #Buscar estacion con capacidad para dejar bicicletas
         #Viajes debería tener el dato de que el usuario dejó la bicicleta?
-        #archivo binario y persist
+        #archivo binario y ¿persist?
 
         for estacion_id, estacion in estaciones.items():
             maximo_anclajes = 30
             if(len(estacion[3]) <= maximo_anclajes):
                 estacion[3].append(datos[0])
                 #eliminar del archivo
-                viajes_en_curso_temp[dni] = [datos[0],datos[1],datos[2],datos[3]]
+                viajes_en_curso_temp[dni] = [datos[0],datos[1],datos[2]]
     
     #Asumiendo que se terminan TODOS los "viajes_en_curso" anteriores, elimino todos los items del archivo y el array sin excepcion
-    viajes_en_curso = viajes_en_curso_temp
-    return viajes_en_curso
+    return viajes_en_curso_temp
 
 
 
