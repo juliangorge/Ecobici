@@ -796,9 +796,7 @@ def menu(estaciones, bicicletas,usuarios, usuarios_bloqueados, viajes_actuales, 
             guardar_viajes_en_curso(viajes_actuales)
             seguir = False
         elif opcion == '1':
-            
-            estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = carga_datos_automatica(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
-            
+            estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = carga_datos_automatica(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
         elif opcion == '2':
            usuarios,usuarios_bloqueados = usuarios_menu(usuarios,usuarios_bloqueados)
         elif opcion == '3':
