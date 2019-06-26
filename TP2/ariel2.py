@@ -1,7 +1,7 @@
 from random import randint, random,uniform
 import os
 import pickle
-
+from haversine import haversine, Unit
 def devolver_bicicletas_inicio(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
     data = []
     with open(r"TP2\viajes_en_curso.pkl","rb") as archivo: 
@@ -24,8 +24,6 @@ def devolver_bicicletas_inicio(estaciones, bicicletas,usuarios,usuarios_bloquead
     
     return estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados, bicicletas_devueltas
     
-
-
 def lectura_estaciones():
     lista_estaciones = recorrer_archivo(r'TP2\estaciones.csv')
     estaciones = {}
@@ -262,6 +260,7 @@ def bloquear_usuario(dni,usuarios,usuarios_bloqueados):
     #Recibe la lista de usuarios bloqueados añade el usuario a bloquear
     usuarios_bloqueados.append(dni)
     usuarios[dni][2] = 0
+    cambiar_pin_archivo(dni,0)
     print('Usuario bloqueado!')
     return (usuarios,usuarios_bloqueados)
 
@@ -276,7 +275,9 @@ def desbloquear_usuario(usuarios, usuarios_bloqueados):
             palabra_secreta = input ("La clave ha sido incorrecta. Ingresela nuevamente: ")
         print ("Su usuario ha sido desbloqueado.")
         usuarios_bloqueados.remove(usuario_a_desbloquear)
-        usuarios[usuario_a_desbloquear][2] = randint(1000,9999) #asigno nuevo pin
+        nuevo_pin = randint(1000,9999) 
+        usuarios[usuario_a_desbloquear][2] = nuevo_pin #asigno nuevo pin
+        cambiar_pin_archivo(usuario_a_desbloquear, nuevo_pin)
         print('Su nuevo pin es: ',usuarios[usuario_a_desbloquear][2])
         return usuarios, usuarios_bloqueados    
     else:
@@ -363,23 +364,41 @@ def simulacion_con_parametro(estaciones,bicicletas,usuarios,usuarios_bloqueados,
     estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = simulacion(cantidad_ejecuciones_simulacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
     return (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
 
+
 def informe_cantidad_viajes(usuarios):
+    lista_viajes = recorrer_archivo(r'TP2\viajes.csv')
+    cantidad_viajes_usuario = {}
+    for datos_viaje in lista_viajes:
+        #estorigen,destino,dni,hora_salida,tiempo_uso, hora_llegada,idbici
+        if int(datos_viaje[2]) not in cantidad_viajes_usuario:
+            cantidad_viajes_usuario[int(datos_viaje[2])] =1
+        else:
+            cantidad_viajes_usuario[int(datos_viaje[2])] += 1
     #muestra los 10 usuarios que mas viajes hicieron
     lista_usuarios = []
     #usuarios[dni][4] --> cantidad viajes usuario
-    for usuario in usuarios:
-        lista_usuarios.append([usuario, usuarios[usuario][0], usuarios[usuario][4]])
+    for usuario in cantidad_viajes_usuario:
+        lista_usuarios.append([usuario, usuarios[usuario][0], cantidad_viajes_usuario[usuario]])
     lista_usuarios.sort (key = lambda usuario:usuario[2], reverse = True)
     for i in range (0,len(lista_usuarios)):
         if(i <= 10):
             print("{} - {}, ({}) con {} viajes\n".format((i+1), lista_usuarios[i][1], lista_usuarios[i][0], lista_usuarios[i][2]))
+
 def informe_duracion_viajes (usuarios):
+    lista_viajes = recorrer_archivo(r'TP2\viajes.csv')
+    duracion_viajes_usuario = {}
+    for datos_viaje in lista_viajes:
+        #estorigen,destino,dni,hora_salida,tiempo_uso, hora_llegada,idbici
+        if int(datos_viaje[2]) not in duracion_viajes_usuario:
+            duracion_viajes_usuario[int(datos_viaje[2])] = int(datos_viaje[4])
+        else:
+            duracion_viajes_usuario[int(datos_viaje[2])] += int(datos_viaje[4])
     #muestra los 5 usuarios con mas duracion acumulada de viajes
     lista_usuarios = []
     claves_usuarios = usuarios.keys()
     #usuarios[dni][3] --> duracion de los viajes del usuario
     for usuario in claves_usuarios:
-        lista_usuarios.append([usuario, usuarios[usuario][0], usuarios[usuario][3]])
+        lista_usuarios.append([usuario, usuarios[usuario][0], duracion_viajes_usuario[usuario]])
     lista_usuarios.sort (key = lambda usuario:usuario[2], reverse = True)
     for i in range (0,5):
         print("{} - {}, ({}) con {} minutos\n".format((i+1), lista_usuarios[i][1], lista_usuarios[i][0], lista_usuarios[i][2]))
@@ -391,10 +410,27 @@ def bicicletas_reparacion(bicicletas_en_reparacion):
         print(bicicleta)
 
 def top_estaciones (estaciones):
+    lista_viajes = recorrer_archivo(r'TP2\viajes.csv')
+    cantidad_usos_estacion = {}
+    for datos_viaje in lista_viajes:
+        #estorigen,destino,dni,hora_salida,tiempo_uso, hora_llegada,idbici
+        estacion_origen  = int(datos_viaje[0])
+        
+        if estacion_origen not in cantidad_usos_estacion:
+            cantidad_usos_estacion[estacion_origen] = 1
+        else:
+            cantidad_usos_estacion[estacion_origen] += 1
+
+        estacion_destino = int(datos_viaje[1])
+
+        if estacion_destino not in cantidad_usos_estacion:
+            cantidad_usos_estacion[estacion_destino] = 1
+        else:
+            cantidad_usos_estacion[estacion_destino] += 1
     #muestra las estaciones mas activas
     top_estaciones_activas = []
     for estacion in estaciones:
-        top_estaciones_activas.append([estacion, estaciones[estacion][4]])
+        top_estaciones_activas.append([estacion, cantidad_usos_estacion[estacion]])
     top_estaciones_activas.sort (key = lambda estacion:estacion[1], reverse = True)
     for i in range (0,10):
         print ((i+1) , "- Estacion: #" , top_estaciones_activas[i][0], 'con', top_estaciones_activas[i][1], 'usos')
@@ -451,9 +487,9 @@ def elegir_anclaje_de_estacion(estacion, estaciones, bicicletas):
     #elije la estacion, la bicicleta y devuelve el numero de la bicicleta, numero de estacion y el anclaje donde esta ubicada
     
     numero_anclaje = 0
-    while len(estaciones[estacion][3]) >= numero_anclaje:
-        if(len(estaciones[estacion][3]) > 0):
-            numero_bicicleta = estaciones[estacion][3][numero_anclaje]
+    while len(estaciones[estacion][4]) >= numero_anclaje:
+        if(len(estaciones[estacion][4]) > 0):
+            numero_bicicleta = estaciones[estacion][4][numero_anclaje]
             if(bicicletas[numero_bicicleta][0] == "ok"):
                 return numero_bicicleta,numero_anclaje
         else:
@@ -497,10 +533,16 @@ def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios
         estaciones[estacion][4].append(numero_bicicleta)
         viajes_finalizados[dni] = [numero_bicicleta, horario_llegada, estacion]
         estaciones[estacion][5] += 1 
+        ubicacion_salida=(estaciones[estacion_origen][0],estaciones[estacion_origen][1])
+        ubicacion_llegada=(estaciones[estacion][0],estaciones[estacion][1])
+        distancia_recorrida = haversine(ubicacion_salida, ubicacion_llegada,unit = Unit.KILOMETERS)
         if duracion_viaje > 60:
             print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}. Al exceder los 60 minutos de uso ha sido bloqueado.\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][2],horario_llegada))
+            print("la distancia recorrida fue de: {} kms.".format(distancia_recorrida))
         else:
             print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}.\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_llegada))
+            print("la distancia recorrida fue de: {} kms.".format(distancia_recorrida))
+        
         #estacion_origen,estacion_destino,dni_usuario,hora_retiro,tiempo_de_uso,hora_de_llegada,id_bici
         #hora_salida, estacion_origen = eliminar_registro_viaje(dni)
         linea_viaje_finalizado = "{},{},{},{},{},{},{}".format(estacion_origen, estacion, dni,hora_salida, duracion_viaje, horario_llegada, numero_bicicleta)
