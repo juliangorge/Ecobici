@@ -24,7 +24,7 @@ def devolver_bicicletas_inicio(estaciones, bicicletas,usuarios,usuarios_bloquead
                 
             except EOFError:
                 seguir = False
-                           
+                         
     return estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados, bicicletas_devueltas
     
 def lectura_estaciones():
@@ -570,7 +570,7 @@ def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios
         linea_viaje_finalizado = "{},{},{},{},{},{},{}".format(estacion_origen, estacion, dni,hora_salida, duracion_viaje, horario_llegada, numero_bicicleta)
         #persistir_viaje_finalizado(linea_viaje_finalizado)
         
-        archivo_viajes_finalizados = open(r'TP2\viajes.csv', 'w', encoding = 'utf-8')
+        archivo_viajes_finalizados = open(r'TP2\viajes.csv', 'a', encoding = 'utf-8')
         archivo_viajes_finalizados.write(linea_viaje_finalizado)
         archivo_viajes_finalizados.close()
         return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
