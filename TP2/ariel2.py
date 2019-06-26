@@ -97,8 +97,8 @@ def merge_usuarios():
     nombre4,celular4,dni4,pin4 = leer_archivo_usuarios(usuarios4, [0,0,999999999,0])
 
     maestro_usuarios = open(r'TP2\maestro_usuarios.csv','w',encoding = 'utf-8')
-    linea_inicio_usuarios = "nombre,celular,dni,pin"
-    maestro_usuarios.write(linea_inicio_usuarios)
+    
+   
     while dni1 !=999999999 or dni2 !=999999999 or dni3 !=999999999 or dni4 !=999999999:
         menor = min(int(dni1),int(dni2),int(dni3),int(dni4))
         while menor  == dni1 and dni1 !=0:
@@ -160,6 +160,18 @@ def recorrer_archivo(direccion):
     archivo.close()
     return informacion_archivo
 
+def recorrer_archivo_completo(direccion):
+    archivo = open(direccion,'r', encoding='utf-8')
+    vacio = []
+    informacion_archivo = []
+    datos_linea = leer_archivo(archivo,vacio)
+  
+    while datos_linea:
+        informacion_archivo.append(datos_linea)
+        datos_linea = leer_archivo(archivo,vacio)    
+    archivo.close()
+    return informacion_archivo
+
 def listar_usuarios(usuarios):
     #muestra un listado de usuarios
     lista_usuarios = []
@@ -178,8 +190,8 @@ def alta_usuario(usuarios):
         nombre = validar_nombre ("Ingrese su nombre y apellido: ")
         celular = validar_celular ("Ingrese su numero de celular: ")
         usuarios[dni] = [nombre,celular,pin, 0, 0] #inicializo en 0 la cantidad de viajes y los minutos de viaje del usuario nuevo
-        linea_usuario_nuevo = "{},{},{},{}".format(nombre,celular,dni,pin)
-        
+        linea_usuario_nuevo = "{},{},{},{} \n".format(nombre,celular,dni,pin)
+        print(linea_usuario_nuevo)
         maestro_usuarios2 = open(r'TP2\maestro_usuarios.csv','a',encoding = 'utf-8')
         maestro_usuarios2.write(linea_usuario_nuevo)
         maestro_usuarios2.close()    
@@ -381,7 +393,7 @@ def informe_cantidad_viajes(usuarios):
         lista_usuarios.append([usuario, usuarios[usuario][0], cantidad_viajes_usuario[usuario]])
     lista_usuarios.sort (key = lambda usuario:usuario[2], reverse = True)
     for i in range (0,len(lista_usuarios)):
-        if(i <= 10):
+        if(i < 10):
             print("{} - {}, ({}) con {} viajes\n".format((i+1), lista_usuarios[i][1], lista_usuarios[i][0], lista_usuarios[i][2]))
 
 def informe_duracion_viajes (usuarios):
@@ -430,7 +442,8 @@ def top_estaciones (estaciones):
     #muestra las estaciones mas activas
     top_estaciones_activas = []
     for estacion in estaciones:
-        top_estaciones_activas.append([estacion, cantidad_usos_estacion[estacion]])
+        if estacion in cantidad_usos_estacion:
+            top_estaciones_activas.append([estacion, cantidad_usos_estacion[estacion]])
     top_estaciones_activas.sort (key = lambda estacion:estacion[1], reverse = True)
     for i in range (0,10):
         print ((i+1) , "- Estacion: #" , top_estaciones_activas[i][0], 'con', top_estaciones_activas[i][1], 'usos')
@@ -648,13 +661,14 @@ def retirar_bicicleta_robando(dni, estaciones, bicicletas, usuarios, viajes_actu
                 return 'bloqueado', dni_ladron, usuarios[dni][0]
             else:
                 linea_viaje_robado = "{},{},{}".format(bicicleta,usuario_asaltado,dni_ladron)
-                archivo_viajes_robados = open(r'TP2/viajes_robados.csv', 'w', encoding = 'utf-8')
+                archivo_viajes_robados = open(r'TP2/viajes_robados.csv', 'a', encoding = 'utf-8')
+                
                 archivo_viajes_robados.write(linea_viaje_robado)
                 archivo_viajes_robados.close()
                 return 'robo', dni_ladron, usuarios[dni_ladron][0]
 
 def informe_viajes_robados ():
-    lista_viajes_robados = recorrer_archivo(r'TP2\viajes_robados.csv')
+    lista_viajes_robados = recorrer_archivo_completo(r'TP2\viajes_robados.csv')
     for datos_viaje in lista_viajes_robados:
         print("la bicicleta {}, fue robada a {} por {} ").format(datos_viaje[0], datos_viaje[1], datos_viaje[2])
     
