@@ -326,13 +326,11 @@ def retirar_bicicleta(forma_de_uso, dni, estaciones, bicicletas, usuarios, viaje
         if forma_de_uso == "manual":
             print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje+1))
         else:
-           print("{} retiro la bicicleta {} de la estación {} ubicada en {}, a las {}\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][0],horario_salida))
+           print("{} retiro la bicicleta {} de la estación {} ubicada en {}, a las {}\n".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][2],horario_salida))
         return (estacion,estaciones, bicicletas, usuarios, viajes_actuales)
     print ("No hay bicicletas disponibles, intente en otra estación")
     return (estacion,estaciones, bicicletas, usuarios, viajes_actuales)
 
-
-    
 def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
     #Simula retiro y devolución de una bicicleta
     for numero_ejecucion in range(0,int(cantidad_ejecuciones)):
@@ -342,10 +340,15 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
             #saco bici
             estacion,estaciones, bicicletas, usuarios, viajes_actuales = retirar_bicicleta("simulacion", dni, estaciones, bicicletas, usuarios, viajes_actuales)
             #busco al azar la estacion a devolver la bicicleta 
+            numeros_estaciones =[]
+            for estacion in estaciones:
+                numeros_estaciones.append(int(estacion))
+            longitud_numeros_estaciones = len(numeros_estaciones) - 1
             estacion_devolucion = estacion
-            while estacion_devolucion == estacion  or len(estaciones[estacion_devolucion][3]) >= estaciones[estacion_devolucion][2]:
-                estacion_devolucion = randint(1,10)
-             #devuelvo bici
+            while estacion_devolucion == estacion  or len(estaciones[estacion_devolucion][4]) >= 29:
+                posicion_estacion = randint(0,longitud_numeros_estaciones)
+                estacion_devolucion = numeros_estaciones[posicion_estacion]
+            #devuelvo bici
             devolver_bicicleta("simulacion",dni,estacion_devolucion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)              
     return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
     
