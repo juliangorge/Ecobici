@@ -33,6 +33,8 @@ def guardar():
         pkl= pickle.Pickler(archivo) #declaro que archivo usara el pkl
         
         linea_viaje = {41:[0,1,1],20:[2,2,2]}
-        pkl.dump(linea_viaje) #convierte la info a binario y lo sube al archivo
+        for linea in linea_viaje:
+            lin = "{},{},{}".format(linea, linea_viaje[linea][0], linea_viaje[linea][1])
+            pkl.dump(lin) #convierte la info a binario y lo sube al archivo
 guardar()
 hola()

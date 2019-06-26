@@ -1,19 +1,31 @@
 from random import randint, random,uniform
 import os
 import pickle
+
 def devolver_bicicletas_inicio(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
-    with open("TP2\viajes_en_curso.pkl","rb") as archivo: 
+    data = []
+    with open(r"TP2\viajes_en_curso.pkl","rb") as archivo: 
         seguir = True
         while seguir: 
             try:
                 data = pickle.load(archivo)    
             except EOFError:
                 seguir = False
+                
+    print(data)            
     bicicletas_devueltas = []
+    
     for viaje in data:
-        devolver_bicicleta("simulacion", viaje, data[viaje][1], estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
-        bicicletas_devueltas.append(data[viaje[0])
+        print(viaje)
+        viajes_actuales[int(viaje[0])] = [int(viaje[1]),int(viaje[2]),viaje[3]]
+        print(viajes_actuales)
+        devolver_bicicleta("simulacion", int(viaje[0]), int(viaje[1]), estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+        bicicletas_devueltas.append(viaje[0])
+    
     return estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados, bicicletas_devueltas
+    
+
+
 def lectura_estaciones():
     lista_estaciones = recorrer_archivo(r'TP2\estaciones.csv')
     estaciones = {}
@@ -30,35 +42,41 @@ def lectura_bicicletas(estaciones):
     #estado,ubicacion
     estado  = "ok"
     ubicacion = "anclada"
+    for datos_bicicleta in lista_bicicletas:
+        numero_bicicleta = int(datos_bicicleta[1])
+        bicicletas[numero_bicicleta] = [estado,ubicacion]
+    return bicicletas, estaciones    
+
+def anclar_bicicletas(bicicletas, estaciones, bicicletas_devueltas):
     numeros_estaciones =[]
     for estacion in estaciones:
         numeros_estaciones.append(int(estacion))
     longitud_numeros_estaciones = len(numeros_estaciones) - 1
-    for datos_bicicleta in lista_bicicletas:
-        if 
-        numero_bicicleta = int(datos_bicicleta[1])
-        bicicletas[numero_bicicleta] = [estado,ubicacion]
-        posicion_estacion = randint(0,longitud_numeros_estaciones)
-        numero_estacion = numeros_estaciones[posicion_estacion]
-        while len(estaciones[numero_estacion][4]) >= 29:
+    for bicicleta in bicicletas:
+        if not bicicleta in bicicletas_devueltas:
             posicion_estacion = randint(0,longitud_numeros_estaciones)
             numero_estacion = numeros_estaciones[posicion_estacion]
-        estaciones[numero_estacion][4].append(numero_bicicleta) 
-    return bicicletas, estaciones    
+            while len(estaciones[numero_estacion][4]) >= 29:
+                posicion_estacion = randint(0,longitud_numeros_estaciones)
+                numero_estacion = numeros_estaciones[posicion_estacion]
+            estaciones[numero_estacion][4].append(bicicleta) 
+    return bicicletas,estaciones
 
-def carga_datos_automatica():
+def carga_datos_automatica(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
     
     estaciones =  lectura_estaciones()
     bicicletas, estaciones = lectura_bicicletas (estaciones)
     print("datos cargados!")
-
+    estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados, bicicletas_devueltas= devolver_bicicletas_inicio(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
     try:
-        usuarios = lectura_usuarios()
+        usuarios, usuarios_bloqueados = lectura_usuarios(usuarios_bloqueados)
     except FileNotFoundError:
         merge_usuarios()
-        usuarios = lectura_usuarios()
+        usuarios, usuarios_bloqueados = lectura_usuarios(usuarios_bloqueados)
+
+    bicicletas, estaciones= anclar_bicicletas(bicicletas, estaciones, bicicletas_devueltas)
     
-    return estaciones, bicicletas,usuarios
+    return estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados
 
 def leer_archivo_usuarios(archivo, vacio):
     linea = archivo.readline() #guarda una cadena de caracteres del archivo
@@ -107,20 +125,25 @@ def merge_usuarios():
     usuarios4.close()
     maestro_usuarios.close()
 
-def lectura_usuarios():
+def lectura_usuarios(usuarios_bloqueados):
     lista_usuarios = recorrer_archivo(r'TP2\maestro_usuarios.csv')
     usuarios = {}
-    tiempo_de_viaje = 0
-    cantidad_viajes = 0
+    
     for datos_usuario in lista_usuarios:
-        #usuarios[dni] = [nombre,celular,pin,tiempo_de_viaje,cantidad_viajes]
-        usuarios[int(datos_usuario[2])] = [datos_usuario[0],datos_usuario[1],int(datos_usuario[3]), tiempo_de_viaje,cantidad_viajes]
-    return usuarios
+        #usuarios[dni] = [nombre,celular,pin]
+        pin = int(datos_usuario[3])
+        dni = int(datos_usuario[2])
+        usuarios[dni] = [datos_usuario[0],datos_usuario[1],pin]
+        if pin == 0:
+            usuarios_bloqueados.append(dni)
+
+    return usuarios, usuarios_bloqueados
 
 def leer_archivo(archivo, vacio):
     linea = archivo.readline() #guarda una cadena de caracteres del archivo
     if linea:
         lista = linea.rstrip().split(",")
+
         return (lista)
     else:
         return (vacio)
@@ -238,7 +261,7 @@ def cambiar_pin_archivo(dni,pin_nuevo):
 def bloquear_usuario(dni,usuarios,usuarios_bloqueados):
     #Recibe la lista de usuarios bloqueados añade el usuario a bloquear
     usuarios_bloqueados.append(dni)
-    usuarios[dni][2] = None
+    usuarios[dni][2] = 0
     print('Usuario bloqueado!')
     return (usuarios,usuarios_bloqueados)
 
@@ -295,7 +318,7 @@ def retirar_bicicleta(forma_de_uso, dni, estaciones, bicicletas, usuarios, viaje
         bicicletas[numero_bicicleta][1] = "En circulación"
         estaciones[estacion][3].remove(numero_bicicleta)
         horario_salida = generar_horario_salida()
-        viajes_actuales[dni] = [numero_bicicleta, estacion, horario_salida]
+        viajes_actuales[dni] = [numero_bicicleta, estacion, horario_salida,0]
         estaciones[estacion][4] += 1
         if forma_de_uso == "manual":
             print("Retire la bicicleta {} de la estación {} en el anclaje {}\n".format(numero_bicicleta, estacion, numero_anclaje+1))
@@ -455,7 +478,7 @@ def generar_horario_salida():
 
 def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
     #Devuelve una bicicleta al diccionario estaciones y la quita de circulacion (viajes actuales), verificando el tiempo. En caso de excederse el usuario debe bloquearse
-    if len(estaciones[estacion][4]) < estaciones[estacion][3]: #se fija que haya lugar en la estacion
+    if len(estaciones[estacion][4]) <= 29: #se fija que haya lugar en la estacion
         duracion_viaje = randint(5,75)
         if duracion_viaje > 60:
             bloquear_usuario(dni,usuarios,usuarios_bloqueados)
@@ -470,8 +493,7 @@ def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios
         estacion_origen = viajes_actuales[dni][2]
         hora_salida = viajes_actuales[dni][3]
         del viajes_actuales[dni] #borra el viaje actual
-        usuarios[dni][3] += duracion_viaje
-        usuarios[dni][4] += 1
+        
         estaciones[estacion][4].append(numero_bicicleta)
         viajes_finalizados[dni] = [numero_bicicleta, horario_llegada, estacion]
         estaciones[estacion][5] += 1 
@@ -483,6 +505,7 @@ def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios
         #hora_salida, estacion_origen = eliminar_registro_viaje(dni)
         linea_viaje_finalizado = "{},{},{},{},{},{},{}".format(estacion_origen, estacion, dni,hora_salida, duracion_viaje, horario_llegada, numero_bicicleta)
         #persistir_viaje_finalizado(linea_viaje_finalizado)
+        
         archivo_viajes_finalizados = open(r'TP2\viajes.csv', 'w', encoding = 'utf-8')
         archivo_viajes_finalizados.write(linea_viaje_finalizado)
         archivo_viajes_finalizados.close()
@@ -493,21 +516,6 @@ def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios
 
 
 
-def eliminar_registro_viaje(dni):
-    archivo_viajes_actuales = open('viajes_en_curso.csv', 'r', encoding = 'utf-8')
-    lineas_viajes = archivo_viajes_actuales.readlines()
-    archivo_viajes_actuales.close()
-    archivo_viajes_actuales = open('viajes_en_curso.csv', 'w', encoding = 'utf-8')
-    for linea in lineas_viajes:
-        lista_linea = linea.split(",")
-        if int(lista_linea[0]) != dni:
-            linea= "{},{},{},{}".format(lista_linea[0],lista_linea[1],lista_linea[2],lista_linea[3])
-            archivo_viajes_actuales.write(linea)  
-        else:
-            horario_salida = lista_linea[3]
-            estacion_origen = lista_linea[2]
-    archivo_viajes_actuales.close()
-    return horario_salida,estacion_origen
 
 def generar_horario_llegada(dni, viajes_actuales, duracion_viaje):
     #recibe los viajes actuales y la duracion del viaje, devuelve el horario de llegada calculado a partir del horario de salida y la duracion
@@ -597,6 +605,10 @@ def retirar_bicicleta_robando(dni, estaciones, bicicletas, usuarios, viajes_actu
                 bloquear_usuario(dni,usuarios,usuarios_bloqueados)
                 return 'bloqueado', dni_, usuarios[dni][0]
             else:
+                linea_viaje_robado = "{},{},{}".format(bicicleta,usuario_asaltado,dni_ladron)
+                archivo_viajes_robados = open(r'TP2\viajes_robados.csv', 'w', encoding = 'utf-8')
+                archivo_viajes_robados.write(linea_viaje_robado)
+                archivo_viajes_robados.close()
                 return 'robo', dni_, usuarios[dni][0]
 
 def informe_viajes_robados ():
@@ -605,16 +617,11 @@ def informe_viajes_robados ():
         print("la bicicleta {}, fue robada a {} por {} ").format(datos_viaje[0], datos_viaje[1], datos_viaje[2])
     
 def guardar_viajes_en_curso(viajes_actuales):
-    with open("ejemplo.pkl","wb") as archivo:
+    with open("viajes_en_curso.pkl","wb") as archivo:
         pkl= pickle.Pickler(archivo) #declaro que archivo usara el pkl
         for viaje in viajes_actuales:
-            linea_viaje = "{},{},{},{}".format(viaje,viaje[0],viaje[1],viaje[2])
+            linea_viaje = "{},{},{},{}".format(viaje,viajes_actuales[viaje][0],viajes_actuales[viaje][1],viajes_actuales[viaje][2])
             pkl.dump(linea_viaje) #convierte la info a binario y lo sube al archivo
-
-    
-        
-
-
 
 def usuarios_menu (usuarios,usuarios_bloqueados):
     print('1 - Listado')
@@ -724,7 +731,7 @@ def menu(estaciones, bicicletas,usuarios, usuarios_bloqueados, viajes_actuales, 
             seguir = False
         elif opcion == '1':
             
-            estaciones,bicicletas,usuarios = carga_datos_automatica()
+            estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = carga_datos_automatica(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
             
         elif opcion == '2':
            usuarios,usuarios_bloqueados = usuarios_menu(usuarios,usuarios_bloqueados)

@@ -1,1 +1,0 @@
-dni,num_bici,estacion,hora_salida
