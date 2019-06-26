@@ -579,6 +579,7 @@ def robar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_
     return (estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
 
 def retirar_bicicleta_robando(dni, estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados):
+    #dni = dni del ladron
     bicicleta = input('Seleccione número de bicicleta: ')
     claves = bicicletas.keys()
     while not int(bicicleta) in claves or not bicicleta.isdigit():
@@ -597,19 +598,18 @@ def retirar_bicicleta_robando(dni, estaciones, bicicletas, usuarios, viajes_actu
             #Elimino el viaje actual del asaltado, generando uno identico pero con el DNI del ladron
             del viajes_actuales[usuario_asaltado[0]]
             viajes_actuales[dni] = [ bicicleta, datos[1], datos[2] ]
-            
 
-    for dni_, usuario in usuarios.items():
-        if dni == dni_:
+    for dni_ladron, usuario in usuarios.items():
+        if dni == dni_ladron:
             if(bloquear):
-                bloquear_usuario(dni,usuarios,usuarios_bloqueados)
-                return 'bloqueado', dni_, usuarios[dni][0]
+                bloquear_usuario(dni_ladron,usuarios,usuarios_bloqueados)
+                return 'bloqueado', dni_ladron, usuarios[dni][0]
             else:
                 linea_viaje_robado = "{},{},{}".format(bicicleta,usuario_asaltado,dni_ladron)
-                archivo_viajes_robados = open(r'TP2\viajes_robados.csv', 'w', encoding = 'utf-8')
+                archivo_viajes_robados = open(r'TP2/viajes_robados.csv', 'w', encoding = 'utf-8')
                 archivo_viajes_robados.write(linea_viaje_robado)
                 archivo_viajes_robados.close()
-                return 'robo', dni_, usuarios[dni][0]
+                return 'robo', dni_ladron, usuarios[dni_ladron][0]
 
 def informe_viajes_robados ():
     lista_viajes_robados = recorrer_archivo(r'TP2\viajes_robados.csv')
