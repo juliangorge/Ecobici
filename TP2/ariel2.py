@@ -184,7 +184,7 @@ def alta_usuario(usuarios):
         celular = validar_celular ("Ingrese su numero de celular: ")
         usuarios[dni] = [nombre,celular,pin, 0, 0] #inicializo en 0 la cantidad de viajes y los minutos de viaje del usuario nuevo
         linea_usuario_nuevo = "{},{},{},{} \n".format(nombre,celular,dni,pin)
-        print(linea_usuario_nuevo)
+        
         maestro_usuarios2 = open('TP2/maestro_usuarios.csv','a',encoding = 'utf-8')
         maestro_usuarios2.write(linea_usuario_nuevo)
         maestro_usuarios2.close()    
@@ -676,7 +676,7 @@ def retirar_bicicleta_robando(dni, estaciones, bicicletas, usuarios, viajes_actu
                 bloquear_usuario(dni_ladron,usuarios,usuarios_bloqueados)
                 return 'bloqueado', dni_ladron, usuarios[dni][0]
             else:
-                linea_viaje_robado = "{},{},{} \n".format(bicicleta,usuario_asaltado,dni_ladron)
+                linea_viaje_robado = "{},{},{} \n".format(bicicleta,usuario_asaltado[0],dni_ladron)
                 archivo_viajes_robados = open('TP2/viajes_robados.csv', 'a', encoding = 'utf-8')
                 archivo_viajes_robados.write(linea_viaje_robado)
                 archivo_viajes_robados.close()
@@ -775,9 +775,9 @@ def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas
     elif opcion == '3':
         estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion = validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)
     elif opcion == '4':
-        #robar bici
+        #robar bici 
         estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados = robar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
-        print("aca se roba la bici")
+        
     elif opcion == '0':
         os.system('clear') #Limpia la terminal
     return (estaciones,usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)
