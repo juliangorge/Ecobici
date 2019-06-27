@@ -392,7 +392,7 @@ def suma_horarios_viajes(pre, post):
         segundo = segundo - 60
         minuto += 1
     
-    if(minuto >= 60):
+    if(int(viaje_posterior[1]) >= 60):
         minuto = minuto - 60
         hora += 1
     
@@ -408,8 +408,7 @@ def informe_duracion_viajes (usuarios):
         if int(datos_viaje[2]) not in duracion_viajes_usuario:
             duracion_viajes_usuario[int(datos_viaje[2])] = datos_viaje[4]
         else:
-            suma_horarios = suma_horarios_viajes(duracion_viajes_usuario[int(datos_viaje[2])], datos_viaje[4])
-            duracion_viajes_usuario[int(datos_viaje[2])] = suma_horarios
+            duracion_viajes_usuario[int(datos_viaje[2])] = suma_horarios_viajes(duracion_viajes_usuario[int(datos_viaje[2])], datos_viaje[4])
     #muestra los 5 usuarios con mas duracion acumulada de viajes
     lista_usuarios = []
     claves_usuarios = usuarios.keys()
