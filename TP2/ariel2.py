@@ -549,8 +549,7 @@ def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios
     #Devuelve una bicicleta al diccionario estaciones y la quita de circulacion (viajes actuales), verificando el tiempo. En caso de excederse el usuario debe bloquearse
     if len(estaciones[estacion][4]) <= 29: #se fija que haya lugar en la estacion
         duracion_viaje = randint(5,75)
-        if duracion_viaje > 60:
-            bloquear_usuario(dni,usuarios,usuarios_bloqueados)
+        
         numero_bicicleta = viajes_actuales[dni][0]
         if forma_de_uso == "manual":
             bicicletas, bicicletas_en_reparacion = estado_bicicleta_devolucion(numero_bicicleta,bicicletas, bicicletas_en_reparacion)
@@ -569,6 +568,8 @@ def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios
         ubicacion_salida=(float(estaciones[estacion_origen][0]),float(estaciones[estacion_origen][1]))
         ubicacion_llegada=(float(estaciones[estacion][0]),float(estaciones[estacion][1]))
         distancia_recorrida = haversine(ubicacion_salida, ubicacion_llegada,unit = Unit.KILOMETERS)
+        if duracion_viaje > 60:
+            bloquear_usuario(dni,usuarios,usuarios_bloqueados)
         if duracion_viaje > 60:
             print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}. Al exceder los 60 minutos de uso ha sido bloqueado.".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][2],horario_llegada))
             print("La distancia recorrida fue de: {} kms.".format(distancia_recorrida))
