@@ -3,7 +3,7 @@ import os
 import pickle
 from haversine import haversine, Unit
 
-def devolver_bicicletas_inicio(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
+def devolver_bicicletas_inicio(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion):
     data = []
     bicicletas_devueltas = []
     with open("TP2/viajes_en_curso.pkl","rb") as archivo: 
@@ -20,11 +20,11 @@ def devolver_bicicletas_inicio(estaciones, bicicletas,usuarios,usuarios_bloquead
                 longitud_numeros_estaciones = len(numeros_estaciones) - 1
                 posicion_estacion = randint(0,longitud_numeros_estaciones)
                 numero_estacion = numeros_estaciones[posicion_estacion]
-                devolver_bicicleta("simulacion", int(viaje[0]), numero_estacion, estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)   
+                devolver_bicicleta("simulacion", int(viaje[0]), numero_estacion, estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)   
                 bicicletas_devueltas.append(viaje[0])
             except EOFError:
                 seguir = False          
-    return estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados, bicicletas_devueltas
+    return estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados, bicicletas_devueltas,bicicletas_en_reparacion
     
 def lectura_estaciones():
     lista_estaciones = recorrer_archivo('TP2/estaciones.csv')
@@ -60,7 +60,7 @@ def anclar_bicicletas(bicicletas, estaciones, bicicletas_devueltas):
             estaciones[numero_estacion][4].append(bicicleta) 
     return bicicletas,estaciones
 
-def carga_datos_automatica(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
+def carga_datos_automatica(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion):
     estaciones =  lectura_estaciones()
     bicicletas, estaciones = lectura_bicicletas (estaciones)
     usuarios_bloqueados = []
@@ -69,10 +69,10 @@ def carga_datos_automatica(estaciones, bicicletas,usuarios,usuarios_bloqueados,v
     except FileNotFoundError:
         merge_usuarios()
         usuarios, usuarios_bloqueados = lectura_usuarios(usuarios_bloqueados)
-    estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados, bicicletas_devueltas= devolver_bicicletas_inicio(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+    estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados, bicicletas_devueltas, bicicletas_en_reparacion= devolver_bicicletas_inicio(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados, bicicletas_en_reparacion)
     bicicletas, estaciones= anclar_bicicletas(bicicletas, estaciones, bicicletas_devueltas)
     print("datos cargados!")
-    return estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados
+    return estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion
 
 def leer_archivo_usuarios(archivo, vacio):
     linea = archivo.readline() #guarda una cadena de caracteres del archivo
@@ -255,7 +255,7 @@ def cambiar_pin_archivo(dni,pin_nuevo):
     for linea in lineas_usuario:
         lista_linea = linea.split(",")
         if int(lista_linea[2]) == dni:
-            linea= "{},{},{},{}".format(lista_linea[0],lista_linea[1],dni,pin_nuevo)
+            linea= "{},{},{},{} \n".format(lista_linea[0],lista_linea[1],dni,pin_nuevo)
         archivo_usuarios.write(linea)
     archivo_usuarios.close()
 
@@ -331,7 +331,7 @@ def retirar_bicicleta(forma_de_uso, dni, estaciones, bicicletas, usuarios, viaje
     print ("No hay bicicletas disponibles, intente en otra estación")
     return (estacion,estaciones, bicicletas, usuarios, viajes_actuales)
 
-def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
+def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion):
     #Simula retiro y devolución de una bicicleta
     for numero_ejecucion in range(0,int(cantidad_ejecuciones)):
         dni = seleccionar_usuario(usuarios,viajes_actuales,usuarios_bloqueados)
@@ -349,16 +349,16 @@ def simulacion(cantidad_ejecuciones,estaciones,bicicletas,usuarios,usuarios_bloq
                 posicion_estacion = randint(0,longitud_numeros_estaciones)
                 estacion_devolucion = numeros_estaciones[posicion_estacion]
             #devuelvo bici
-            devolver_bicicleta("simulacion",dni,estacion_devolucion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)              
-    return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+            devolver_bicicleta("simulacion",dni,estacion_devolucion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)              
+    return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)
     
-def simulacion_con_parametro(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
+def simulacion_con_parametro(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion):
     #Se ingresa la cantidad de veces que se quiere ejecutar simulacion()
     cantidad_ejecuciones_simulacion = input("Ingrese la cantidad de simulaciones: ")
     while not cantidad_ejecuciones_simulacion.isdigit():
         cantidad_ejecuciones_simulacion = input("Ingrese una cantidad de simulaciones valida: ")
-    estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = simulacion(cantidad_ejecuciones_simulacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
-    return (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+    estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion = simulacion(cantidad_ejecuciones_simulacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)
+    return (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)
 
 def informe_cantidad_viajes(usuarios):
     lista_viajes = recorrer_archivo('TP2/viajes.csv')
@@ -379,24 +379,58 @@ def informe_cantidad_viajes(usuarios):
         if(i < 10):
             print("{} - {}, ({}) con {} viajes\n".format((i+1), lista_usuarios[i][1], lista_usuarios[i][0], lista_usuarios[i][2]))
 
+def suma_horarios_viajes(horario_previo, horario_a_sumar):
+    viaje_previo = horario_previo.split(':')
+    viaje_posterior = horario_a_sumar.split(':')
+
+    hora_previo = int(viaje_previo[0])
+    minuto_previo = int(viaje_previo[1])
+    segundo_previo = int(viaje_previo[2])
+
+    hora = int(viaje_posterior[0]) + hora_previo
+    minuto = int(viaje_posterior[1]) + minuto_previo
+    segundo = int(viaje_posterior[2]) + segundo_previo
+
+    if(segundo >= 60):
+        segundo = segundo - 60
+        minuto += 1
+    
+    if(minuto >= 60):
+        minuto = minuto - 60
+        hora += 1
+    
+    horario = str(hora) + ':' + str(minuto) + ':' + str(segundo)
+    return(horario)
+
 def informe_duracion_viajes (usuarios):
     lista_viajes = recorrer_archivo('TP2/viajes.csv')
     duracion_viajes_usuario = {}
     for datos_viaje in lista_viajes:
         #estorigen,destino,dni,hora_salida,tiempo_uso, hora_llegada,idbici
         if int(datos_viaje[2]) not in duracion_viajes_usuario:
-            duracion_viajes_usuario[int(datos_viaje[2])] = int(datos_viaje[4])
+            duracion_viajes_usuario[int(datos_viaje[2])] = datos_viaje[4]
         else:
-            duracion_viajes_usuario[int(datos_viaje[2])] += int(datos_viaje[4])
+            duracion_viajes_usuario[int(datos_viaje[2])] = suma_horarios_viajes(duracion_viajes_usuario[int(datos_viaje[2])], datos_viaje[4])
     #muestra los 5 usuarios con mas duracion acumulada de viajes
     lista_usuarios = []
-    claves_usuarios = usuarios.keys()
+    
     #usuarios[dni][3] --> duracion de los viajes del usuario
-    for usuario in claves_usuarios:
+    for usuario in duracion_viajes_usuario:
         lista_usuarios.append([usuario, usuarios[usuario][0], duracion_viajes_usuario[usuario]])
     lista_usuarios.sort (key = lambda usuario:usuario[2], reverse = True)
     for i in range (0,5):
-        print("{} - {}, ({}) con {} minutos\n".format((i+1), lista_usuarios[i][1], lista_usuarios[i][0], lista_usuarios[i][2]))
+        horario = lista_usuarios[i][2].split(":")
+        hora = int(horario[0])
+        minuto = int(horario[1])
+        segundo = int(horario[2])
+        if hora < 10:
+            hora = "0" + str(horario[0])
+        if minuto < 10:
+            minuto = "0" + str(horario[1])
+        if segundo < 10:
+            segundo = "0" + str(horario[2])        
+        horario = str(hora) + ':' + str(minuto) + ':' + str(segundo)    
+        print("{} - {}, ({}) con {} tiempo\n".format((i+1), lista_usuarios[i][1], lista_usuarios[i][0], horario))
 
 def bicicletas_reparacion(bicicletas_en_reparacion):
     #muestra las bicicletas en reparacion
@@ -508,7 +542,7 @@ def generar_horario_salida():
         horario_salida = str(hora) + ':' + str(minuto) + ':' + str(segundos)
     return(horario_salida)
 
-def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
+def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion):
     #Devuelve una bicicleta al diccionario estaciones y la quita de circulacion (viajes actuales), verificando el tiempo. En caso de excederse el usuario debe bloquearse
     if len(estaciones[estacion][4]) <= 29: #se fija que haya lugar en la estacion
         duracion_viaje = randint(5,75)
@@ -516,15 +550,17 @@ def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios
             bloquear_usuario(dni,usuarios,usuarios_bloqueados)
         numero_bicicleta = viajes_actuales[dni][0]
         if forma_de_uso == "manual":
-            bicicletas = estado_bicicleta_devolucion(numero_bicicleta,bicicletas)
+            bicicletas, bicicletas_en_reparacion = estado_bicicleta_devolucion(numero_bicicleta,bicicletas, bicicletas_en_reparacion)
         else:
             bicicletas[numero_bicicleta][0] = "ok"
             bicicletas[numero_bicicleta][1] = "anclada"
+        if not numero_bicicleta in bicicletas_en_reparacion:
+            estaciones[estacion][4].append(numero_bicicleta)
         horario_llegada = generar_horario_llegada(dni, viajes_actuales, duracion_viaje)
         estacion_origen = viajes_actuales[dni][1]
         hora_salida = viajes_actuales[dni][2]
         del viajes_actuales[dni] #borra el viaje actual
-        estaciones[estacion][4].append(numero_bicicleta)
+       
         viajes_finalizados[dni] = [numero_bicicleta, horario_llegada, estacion]
         #estaciones[estacion][5] += 1 
         ubicacion_salida=(float(estaciones[estacion_origen][0]),float(estaciones[estacion_origen][1]))
@@ -536,15 +572,26 @@ def devolver_bicicleta(forma_de_uso, dni,estacion,estaciones,bicicletas,usuarios
         else:
             print("{} devolvio la bicicleta {} en la estación {} ubicada en {}, a las {}.".format(usuarios[dni][0],numero_bicicleta, estacion,estaciones[estacion][2],horario_llegada))
             print("la distancia recorrida fue de: {} kms.".format(distancia_recorrida))
-        linea_viaje_finalizado = "{},{},{},{},{},{},{} \n".format(estacion_origen, estacion, dni,hora_salida, duracion_viaje, horario_llegada, numero_bicicleta)
+        duracion =  generar_duracion_viaje(duracion_viaje)
+        linea_viaje_finalizado = "{},{},{},{},{},{},{} \n".format(estacion_origen, estacion, dni,hora_salida, duracion, horario_llegada, numero_bicicleta)
         archivo_viajes_finalizados = open('TP2/viajes.csv', 'a', encoding = 'utf-8')
         archivo_viajes_finalizados.write(linea_viaje_finalizado)
         archivo_viajes_finalizados.close()
         return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
     else:
         print("No hay anclajes disponibles.\n")
-    return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)  
+    return(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)  
 
+def generar_duracion_viaje(duracion_viaje):
+    #le pone formato a la duracion
+    hora = 0
+    minuto = duracion_viaje
+    segundos = 00
+    if duracion_viaje >= 60:
+        hora = 1
+        minuto =  minuto - 60
+    duracion = str(hora) + ':' + str(minuto) + ':' + str(segundos)  
+    return duracion
 def generar_horario_llegada(dni, viajes_actuales, duracion_viaje):
     #recibe los viajes actuales y la duracion del viaje, devuelve el horario de llegada calculado a partir del horario de salida y la duracion
     horario = viajes_actuales[dni][2].split(':')
@@ -563,17 +610,18 @@ def generar_horario_llegada(dni, viajes_actuales, duracion_viaje):
         horario_llegada = str(hora) + ':' + str(minuto) + ':'  + str(segundos)
     return (horario_llegada)
 
-def estado_bicicleta_devolucion(numero_bicicleta,bicicletas):
+def estado_bicicleta_devolucion(numero_bicicleta,bicicletas,bicicletas_en_reparacion):
     #el usuario ingresa si la bici necesita reparacion o no cuando la devuelve, devuelve el diccionario bicicletas actualizado
     necesita_reparacion = input("¿La bicicleta necesita reparacion? si/no: ")
     while necesita_reparacion != "si" and necesita_reparacion!= "no":
         necesita_reparacion = input("¿La bicicleta necesita reparacion? si/no: ")
     if necesita_reparacion == "si":
         bicicletas[numero_bicicleta][0] = "reparacion"
-    bicicletas[numero_bicicleta][1] = "anclada"
-    return bicicletas
+    bicicletas[numero_bicicleta][1] = "reparacion"
+    bicicletas_en_reparacion.append(numero_bicicleta)
+    return bicicletas,bicicletas_en_reparacion
 
-def validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
+def validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion):
     #pide los datos para devolver la bicicleta, en caso de ser validos y tener una bicicleta, la devuelve
     dni = validar_dni("Ingrese su numero de dni: ")
     while not dni in usuarios:
@@ -583,10 +631,10 @@ def validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_b
         #Verificar estación
         while not estacion in estaciones:
             estacion = int(input('Seleccione número de estación: '))
-        devolver_bicicleta("manual",dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)    
+        devolver_bicicleta("manual",dni,estacion,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)    
     else:    
         print('No tienes ninguna bicicleta para devolver!')
-    return estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados
+    return estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion
 
 def robar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados):
     #Retira una bicicleta del diccionario estaciones y la pone en circulacion (viajes actuales), verificando que el usuario no esté bloqueado
@@ -628,7 +676,7 @@ def retirar_bicicleta_robando(dni, estaciones, bicicletas, usuarios, viajes_actu
                 bloquear_usuario(dni_ladron,usuarios,usuarios_bloqueados)
                 return 'bloqueado', dni_ladron, usuarios[dni][0]
             else:
-                linea_viaje_robado = "{},{},{}".format(bicicleta,usuario_asaltado,dni_ladron)
+                linea_viaje_robado = "{},{},{} \n".format(bicicleta,usuario_asaltado,dni_ladron)
                 archivo_viajes_robados = open('TP2/viajes_robados.csv', 'a', encoding = 'utf-8')
                 archivo_viajes_robados.write(linea_viaje_robado)
                 archivo_viajes_robados.close()
@@ -670,7 +718,7 @@ def usuarios_menu (usuarios,usuarios_bloqueados):
         os.system('clear') #Limpia la terminal
     return (usuarios,usuarios_bloqueados)
 
-def retiros_automaticos_menu (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados):
+def retiros_automaticos_menu (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion):
     print('1 - Viaje aleatorio')
     print('2 - Viajes aleatorios múltiples')
     print('0 - Salir')
@@ -679,12 +727,12 @@ def retiros_automaticos_menu (estaciones,bicicletas,usuarios,usuarios_bloqueados
         print('La opción es incorrecta.\n')
         opcion = input('Elige una opción para continuar: ')
     if opcion == '1':
-        estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = simulacion(1,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+        estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion = simulacion(1,estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)
     elif opcion == '2':
-        estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = simulacion_con_parametro(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+        estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion = simulacion_con_parametro(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)
     elif opcion == '0':
         os.system('clear') #Limpia la terminal
-    return (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+    return (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)
 
 def informes_menu (estaciones,usuarios,bicicletas_en_reparacion):
     print('1 - Usuarios con mayor cantidad de viajes')
@@ -710,7 +758,7 @@ def informes_menu (estaciones,usuarios,bicicletas_en_reparacion):
     elif opcion == '0':
         os.system('clear') #Limpia la terminal
     
-def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados):
+def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados,):
     print('1 - Modificar PIN')
     print('2 - Retirar Bicicleta')
     print('3 - Devolver bicicletas')
@@ -725,14 +773,14 @@ def ingreso_al_sistema_menu (estaciones, usuarios,usuarios_bloqueados,bicicletas
     elif opcion == '2':
         estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados = retirar_bicicleta_ingreso(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
     elif opcion == '3':
-        estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+        estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion = validar_ingreso_devolver_bicicleta(estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)
     elif opcion == '4':
         #robar bici
         estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados = robar_bicicleta(estaciones, bicicletas, usuarios, viajes_actuales, usuarios_bloqueados)
         print("aca se roba la bici")
     elif opcion == '0':
         os.system('clear') #Limpia la terminal
-    return (estaciones,usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados)
+    return (estaciones,usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)
 
 ##############################
 #####     MAIN CODE      #####
@@ -753,16 +801,16 @@ def menu(estaciones, bicicletas,usuarios, usuarios_bloqueados, viajes_actuales, 
         if opcion == '0':
             seguir = False
         elif opcion == '1':
-            estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = carga_datos_automatica(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+            estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion = carga_datos_automatica(estaciones, bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)
         elif opcion == '2':
            usuarios,usuarios_bloqueados = usuarios_menu(usuarios,usuarios_bloqueados)
         elif opcion == '3':
-            estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados = retiros_automaticos_menu (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados)
+            estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados, bicicletas_en_reparacion = retiros_automaticos_menu (estaciones,bicicletas,usuarios,usuarios_bloqueados,viajes_actuales,viajes_finalizados,bicicletas_en_reparacion)
         elif opcion == '4':
             informes_menu(estaciones,usuarios,bicicletas_en_reparacion)
         elif opcion == '5':
             #Ingreso al sistema
-            estaciones,usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados = ingreso_al_sistema_menu(estaciones, usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados)
+            estaciones,usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados, bicicletas_en_reparacion = ingreso_al_sistema_menu(estaciones, usuarios,usuarios_bloqueados,bicicletas,bicicletas_en_reparacion,viajes_actuales,viajes_finalizados)
         else:
             os.system('clear') #Limpia la terminal
             print('Vuelva a intentarlo')
