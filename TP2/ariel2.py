@@ -685,7 +685,7 @@ def retirar_bicicleta_robando(dni, estaciones, bicicletas, usuarios, viajes_actu
 def informe_viajes_robados ():
     lista_viajes_robados = recorrer_archivo_completo('TP2/viajes_robados.csv')
     for datos_viaje in lista_viajes_robados:
-        print("la bicicleta {}, fue robada a {} por {} ").format(datos_viaje[0], datos_viaje[1], datos_viaje[2])
+        print("la bicicleta {}, fue robada a {} por {} ".format(datos_viaje[0], datos_viaje[1], datos_viaje[2]))
     
 def guardar_viajes_en_curso(viajes_actuales):
     with open("TP2/viajes_en_curso.pkl","wb") as archivo:
